@@ -5,6 +5,7 @@ require 'require_all'
 require 'bookshark/extractors/author_extractor'
 require 'bookshark/extractors/ddc_extractor'
 require 'bookshark/extractors/book_extractor'
+require 'bookshark/extractors/publisher_extractor'
 
 # require_all 'lib/bookshark/crawlers'
 # Dir["lib/bookshark/crawlers/*"].each {|file| require File.basename file, extn }
@@ -33,7 +34,7 @@ module Bookshark
 
     def initialize(options = {})
       options = DEFAULTS.merge(options)
-      @site = options[:site]
+      @site   = options[:site]
       @format = options[:format]
     end
 
@@ -47,6 +48,18 @@ module Bookshark
 
       return author
     end
+
+    def publisher(options = {})
+      uri = process_options(options, __method__)
+      options[:format] ||= @format
+
+      publisher_extractor = Biblionet::Extractors::PublisherExtractor.new
+      publisher = publisher_extractor.load_and_extract_publisher(uri)
+      publisher.to_json if options[:format] == 'json'
+
+      return JSON.pretty_generate(publisher)
+      # return uri     
+    end    
 
     def book(uri=nil, options = {})
       bp = Biblionet::Extractors::BookExtractor.new
@@ -108,11 +121,32 @@ module Bookshark
       # puts caller_locations(1,1)[0].label
       # options[:format] ||= @format
       puts caller
+      id = options[:id]
 
-      options[:local] ||= false
-      url = "#{Bookshark::path_to_storage}/html_author_pages/#{options[:id].to_s}" unless not options[:local] or options[:id].nil?
-      url = "http://www.biblionet.gr/author/#{options[:id].to_s}" unless options[:local] or options[:id].nil?
+      if id
+        case caller.to_s
+        when 'author'
+          url_method    = 'author'
+          local_path    = "html_author_pages/#{((id-1)/1000)}/author_#{id}.html"
+        when 'publisher'
+          url_method    = 'com'
+          local_path    = "html_publisher_pages/#{((id-1)/100)}/publisher_#{id}.html"
+        when 'book'
+          url_method    = 'book'
+          local_path    = "html_book_pages/#{((id-1)/1000)}/book_#{id}.html"
+        when 'ddcs'
+          url_method    = 'index' 
+          local_path    = "html_ddc_pages/#{((id-1)/1000)}/ddc_#{id}.html"       
+        else
+          puts "Called from unknown method. Probably its rspec."
+        end      
+
+        options[:local] ||= false
+        url = "#{Bookshark::path_to_storage}/#{local_path}" unless not options[:local]
+        url = "http://www.biblionet.gr/#{url_method}/#{id}" unless options[:local]
+      end
       uri = options[:uri] ||= url
+
       return uri
     end             
   

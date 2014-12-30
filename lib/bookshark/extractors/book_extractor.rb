@@ -32,9 +32,9 @@ module Biblionet
       # job1: contributor1, contributor2 job2: contributor3
       # The returned hash is in form: {job1 => ["contributor1","contributor2"],job2 => ["contributor3"]}
       def proccess_contributors(raw_contributors)
-        contributors = Hash.new
-        partners = Array.new
-        job = "authors"
+        contributors  = Hash.new
+        partners      = Array.new
+        job           = "authors"
         raw_contributors.each do |cb|
           if cb.end_with? ":"
             job = cb[0..-2]
