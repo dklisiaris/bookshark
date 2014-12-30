@@ -1,6 +1,6 @@
-require 'rubygems'
-
 require_relative 'base'
+require 'sanitize'
+require 'htmlentities'
 
 module Biblionet
   module Extractors   

@@ -40,5 +40,3 @@ def crawl_and_save(options={})
   end
 
 end
-
-crawl_and_save

@@ -1,11 +1,19 @@
 require "bookshark/version"
 require 'bookshark/storage/file_manager'
+require 'require_all'
+
 require 'bookshark/extractors/author_extractor'
 require 'bookshark/extractors/ddc_extractor'
 require 'bookshark/extractors/book_extractor'
 
+# require_all 'lib/bookshark/crawlers'
+# Dir["lib/bookshark/crawlers/*"].each {|file| require File.basename file, extn }
+
+require 'bookshark/crawlers/base'
+require 'bookshark/crawlers/publisher_crawler'
+
 module Bookshark
-  EXTRACTOR_DEFAULTS = {
+  DEFAULTS = {
     site: 'biblionet',
     format: 'hash'
   }
@@ -21,12 +29,12 @@ module Bookshark
 
   class Extractor
     include FileManager
-    attr_accessor :site
+    attr_accessor :site, :format    
 
     def initialize(options = {})
-      options = EXTRACTOR_DEFAULTS.merge(options)
+      options = DEFAULTS.merge(options)
       @site = options[:site]
-      @formal = options[:format]
+      @format = options[:format]
     end
 
     def author(options = {})
@@ -109,6 +117,28 @@ module Bookshark
     end             
   
   end
+
+
+  class Crawler
+    include FileManager
+    attr_accessor :site
+
+    def initialize(options = {})
+      options = DEFAULTS.merge(options)
+      @site   = options[:site]    
+    end
+
+    def publishers
+      # crawler = Biblionet::Crawlers::Base.new(start:1, finish:100, step:10)
+      # crawler.spider do |url, path|
+      #   puts "URL: #{url}, PATH: #{path}"
+      # end
+      # puts Biblionet::Extractors::Base.new("http://www.biblionet.gr/com/245").page
+      crawler = Biblionet::Crawlers::PublisherCrawler.new
+      crawler.crawl_and_save
+    end
+
+  end  
 
 #   module Biblionet
 #     class Extract

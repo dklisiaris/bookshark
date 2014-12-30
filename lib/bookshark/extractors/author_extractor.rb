@@ -1,8 +1,3 @@
-require 'rubygems'
-require 'nokogiri'
-require 'sanitize'
-require 'htmlentities'
-
 require_relative 'base'
 
 module Biblionet

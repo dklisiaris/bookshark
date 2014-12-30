@@ -6,6 +6,8 @@ require 'json'
 require 'logger'
 require 'pp'
 
+
+
 require File.expand_path(File.join(File.dirname(__FILE__), '../storage', 'file_manager'))
 
 module Biblionet
@@ -53,9 +55,9 @@ module Biblionet
           @url = url
           @biblionet_id = url[/\d+(?!.*\d+)/] unless url.nil? # id is expected to be the last number.
 
-          pp "Parsing page: #{url}"
+          pp "Downloading page: #{url}"
           open(url, :content_length_proc => lambda do |content_length|
-            raise EmptyPageError.new(url, content_length) unless content_length > 1024
+            raise EmptyPageError.new(url, content_length) unless content_length.nil? or content_length > 1024
           end) do |f|        
             # pp f.status == ["200", "OK"] ? "success: #{f.status}" : f.status            
             # pp  f.meta

@@ -1,6 +1,3 @@
-require 'rubygems'
-require 'nokogiri'
-
 require_relative 'base'
 
 module Biblionet
