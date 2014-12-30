@@ -21,11 +21,14 @@ module Biblionet
         puts "Extracting publisher: #{biblionet_id}"
         page = PublisherDataExtractor.new(publisher_page)
         
+        headquarters                    = page.headquarters
+        bookstores                      = page.bookstores
+        bookstores['Έδρα']              = headquarters 
+
         publisher_hash = {}
-        publisher_hash['name'] = page.name
-        publisher_hash['owner'] = page.owner
-        publisher_hash['headquarters'] = page.headquarters
-        publisher_hash['bookstores'] = page.bookstores
+        publisher_hash['name']          = page.name
+        publisher_hash['owner']         = page.owner       
+        publisher_hash['bookstores']    = bookstores
 
         return @publisher = publisher_hash
       end
@@ -69,23 +72,27 @@ module Biblionet
           unless key.empty? and value.empty?
             if current_key == last_key              
               temp_array << headquarters_hash[current_key] unless headquarters_hash[current_key].is_a?(Array)
-              temp_array << value unless value.empty?
+              temp_array << value.gsub(/,$/, '').strip unless value.empty?
               headquarters_hash[current_key] = temp_array
             else
-              temp_array              = []
-              headquarters_hash[current_key]  = value
+              temp_array                      = []
+              headquarters_hash[current_key]  = value.gsub(/,$/, '').strip
             end
           end
 
-          last_key = current_key
-          # puts item.next_sibling == '\n' ? 'yes' : 'no'
+          last_key = current_key          
         end
-        # c = @nodeset.xpath("//table[@class='book_details'][1]//td").inner_html.split("<br>").map(&:strip).reject!(&:empty?)
-        headquarters_hash
+
+        # Change keys. Use the same as in bookstores.
+        mappings = {"Διεύθυνση" => "address", "Τηλ" => "tel", "FAX" => "fax", "E-mail" => "email", "Web site" => "website"}
+        headquarters_hash = Hash[headquarters_hash.map {|k, v| [mappings[k], v] }]
+        headquarters_hash['website'] = headquarters_hash['website'].split(',').map(&:strip) if headquarters_hash['website'].include? ','
+
+        return headquarters_hash                
       end
 
       def bookstores
-        bookstores_hash  = Hash.new { |h,k| h[k] = {} }
+        bookstores_hash = Hash.new { |h,k| h[k] = {} }
         address_array   = []
         tel_array       = []
 
@@ -107,14 +114,15 @@ module Biblionet
           elsif item =~ regex_tel
             tel_array << item.gsub(/[^\d{3} \d{2}]/, '').strip            
             bookstores_hash[key]['tel']        = tel_array            
-          elsif item =~ regex_tk            
-            bookstores_hash[key]['tk']         = item             
+          elsif item =~ regex_tk
+            address_array << item.gsub(/,$/, '').strip                       
+            bookstores_hash[key]['address']    = address_array            
           elsif item =~ regex_email            
             bookstores_hash[key]['email']      = (regex_email.match(item))[0]                        
           elsif item =~ regex_url            
             bookstores_hash[key]['website']    = item[regex_url,1]            
           else
-            address_array << item            
+            address_array << item.gsub(/,$/, '').strip            
             bookstores_hash[key]['address']    = address_array            
           end
 
