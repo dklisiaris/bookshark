@@ -29,6 +29,7 @@ module Biblionet
         publisher_hash['name']          = page.name
         publisher_hash['owner']         = page.owner       
         publisher_hash['bookstores']    = bookstores
+        publisher_hash['b_id']          = biblionet_id
 
         return @publisher = publisher_hash
       end
@@ -84,9 +85,9 @@ module Biblionet
         end
 
         # Change keys. Use the same as in bookstores.
-        mappings = {"Διεύθυνση" => "address", "Τηλ" => "tel", "FAX" => "fax", "E-mail" => "email", "Web site" => "website"}
-        headquarters_hash = Hash[headquarters_hash.map {|k, v| [mappings[k], v] }]
-        headquarters_hash['website'] = headquarters_hash['website'].split(',').map(&:strip) if headquarters_hash['website'].include? ','
+        mappings                      = {"Διεύθυνση" => "address", "Τηλ" => "telephone", "FAX" => "fax", "E-mail" => "email", "Web site" => "website"}
+        headquarters_hash             = Hash[headquarters_hash.map {|k, v| [mappings[k], v] }]
+        headquarters_hash['website']  = headquarters_hash['website'].split(',').map(&:strip) if headquarters_hash['website'].include? ','
 
         return headquarters_hash                
       end
@@ -113,7 +114,7 @@ module Biblionet
             bookstores_hash[key]['fax']        = item.gsub(/[^\d{3} \d{2}]/, '').strip            
           elsif item =~ regex_tel
             tel_array << item.gsub(/[^\d{3} \d{2}]/, '').strip            
-            bookstores_hash[key]['tel']        = tel_array            
+            bookstores_hash[key]['telephone']  = tel_array            
           elsif item =~ regex_tk
             address_array << item.gsub(/,$/, '').strip                       
             bookstores_hash[key]['address']    = address_array            

@@ -5,8 +5,7 @@ require 'nokogiri'
 require 'json'
 require 'logger'
 require 'pp'
-
-
+require 'htmlentities'
 
 require File.expand_path(File.join(File.dirname(__FILE__), '../storage', 'file_manager'))
 
@@ -131,6 +130,18 @@ module Biblionet
         save_to(path, @page)
         pp "Saving page: #{path}"
       end
+
+      # Decodes text with escaped html entities and returns the decoded text.
+      #
+      # ==== Params:
+      #
+      # +encoded_text+:: the text which contains encoded entities
+      #
+      def decode_text(encoded_text)
+        # encoded_text = File.read(encoded_file_path)
+        coder = HTMLEntities.new
+        coder.decode(encoded_text)
+      end      
 
     end
 

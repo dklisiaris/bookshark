@@ -43,10 +43,12 @@ module Bookshark
       options[:format] ||= @format
 
       author_extractor = Biblionet::Extractors::AuthorExtractor.new
-      author = author_extractor.load_and_extract_author(uri)      
-      author.to_json if options[:format] == 'json'
-
-      return author
+      author = author_extractor.load_and_extract_author(uri) 
+          
+      response = {}      
+      response['author'] = [author]
+      response = change_format(response, options[:format])
+      return response
     end
 
     def publisher(options = {})
@@ -55,15 +57,28 @@ module Bookshark
 
       publisher_extractor = Biblionet::Extractors::PublisherExtractor.new
       publisher = publisher_extractor.load_and_extract_publisher(uri)
-      publisher.to_json if options[:format] == 'json'
+      
+      response = {}      
+      response['publisher'] = [publisher]
+      response = change_format(response, options[:format])
+      response = publisher_extractor.decode_text(response)
 
-      return JSON.pretty_generate(publisher)
+      return response
       # return uri     
     end    
 
-    def book(uri=nil, options = {})
-      bp = Biblionet::Extractors::BookExtractor.new
-      bp.load_and_extract_book(uri)
+    def book(options = {})
+      uri = process_options(options, __method__)
+      options[:format] ||= @format
+
+      book_extractor = Biblionet::Extractors::BookExtractor.new
+      book = book_extractor.load_and_extract_book(uri)
+
+      response = {}      
+      response['book'] = [book]
+      response = change_format(response, options[:format])
+      
+      return response            
     end
 
     def ddcs(uri=nil, options = {})
@@ -142,13 +157,25 @@ module Bookshark
         end      
 
         options[:local] ||= false
-        url = "#{Bookshark::path_to_storage}/#{local_path}" unless not options[:local]
+        url = "#{Bookshark::path_to_storage}/#{local_path}" if options[:local]
         url = "http://www.biblionet.gr/#{url_method}/#{id}" unless options[:local]
       end
       uri = options[:uri] ||= url
 
       return uri
-    end             
+    end  
+
+    def change_format(hash, format)
+      case format
+      when 'hash'
+        return hash
+      when 'json'
+        hash = hash.to_json
+      when 'pretty_json'
+        hash = JSON.pretty_generate(hash) 
+      end
+      return hash
+    end           
   
   end
 

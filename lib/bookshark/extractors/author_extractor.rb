@@ -28,12 +28,14 @@ module Biblionet
         identity = split_name(page.fullname)
 
         author_hash = {}
+        author_hash['name'] = identity[:lastname] + ', ' + identity[:firstname]
         author_hash['firstname'] = identity[:firstname]
         author_hash['lastname'] = identity[:lastname]
         author_hash['lifetime'] = identity[:lifetime]
         author_hash['image'] = page.image
         author_hash['bio'] = page.bio
-        author_hash['awards'] = page.awards
+        author_hash['award'] = page.awards
+        author_hash['b_id'] = biblionet_id
 
         # puts JSON.pretty_generate(author_hash)
 
@@ -97,11 +99,11 @@ module Biblionet
       def awards
         awards = []        
         @nodeset.xpath("//a[@class='booklink' and @href[contains(.,'page=showaward') ]]").each do |item|
-          award = {'award' => item.text, 'at_year' => item.next_sibling.text.strip}          
+          award = {'name' => item.text, 'year' => item.next_sibling.text.strip.gsub(/[^\d]/, '')}          
           awards << award
         end
 
-        return awards.empty? ? nil : awards
+        return awards
       end
 
     end  

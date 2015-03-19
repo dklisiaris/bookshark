@@ -1,6 +1,5 @@
 require_relative 'base'
 require 'sanitize'
-require 'htmlentities'
 
 module Biblionet
   module Extractors   
@@ -18,15 +17,6 @@ module Biblionet
         extract_book unless uri.nil?
       end      
 
-      # Decodes a file with escaped html entities and returns the decoded text.
-      # ==== Params:
-      # +encoded_file_path+:: the path of the file we want to decode
-      def decode_file(encoded_file_path)
-        encoded_text = File.read(encoded_file_path)
-        coder = HTMLEntities.new
-        coder.decode(encoded_text)
-      end
-
       # Converts the parsed contributors string to hash. 
       # String must have been processed into the following form:
       # job1: contributor1, contributor2 job2: contributor3
@@ -34,9 +24,9 @@ module Biblionet
       def proccess_contributors(raw_contributors)
         contributors  = Hash.new
         partners      = Array.new
-        job           = "authors"
+        job           = "author"
         raw_contributors.each do |cb|
-          if cb.end_with? ":"
+          if cb.is_a?(String) and cb.end_with? ":"
             job = cb[0..-2]
             partners.clear
           else
@@ -51,9 +41,10 @@ module Biblionet
       def proccess_details(details)
         details_hash = Hash.new
         
-        details.each do |detail|
+        details.each do |detail|          
           date_regex = /(^\d{4}$)/
           status_regex = /^\[\p{Word}+(?:\s*[\'\-\+\s]\s*\p{Word}+)*\]$/  
+          detail = decode_text(detail)
 
           begin
             if detail =~ date_regex
@@ -118,9 +109,10 @@ module Biblionet
         return ddc_hash
       end  
 
-      def extract_book(biblionet_id=@biblionet_id, book_page=@page)        
-        log = Logger.new(File.new("logs/book_parsing.log",'a'))
-        
+
+      def extract_book(biblionet_id=@biblionet_id, book_page=@page)                
+        log = Logger.new(File.new(File.dirname(__dir__).to_s + "/logs/book_parsing.log",'a+'))
+                
         page = BookDataExtractor.new(book_page)
 
         book_hash = Hash.new      
@@ -136,19 +128,20 @@ module Biblionet
           log.error(err_msg)                            
         end
 
-        book_hash['image'] = img        
-        book_hash['title'] = page.title            
+        book_hash['title'] = page.title 
+        book_hash['subtitle'] = page.subtitle        
+        book_hash['image'] = img                          
       
         contributors = proccess_contributors(page.contributors)
 
-        authors = contributors['authors']
-        contributors.delete('authors')
+        author = contributors['author']
+        contributors.delete('author')
         
         # If author is empty, maybe its a collective work.
-        if authors.nil? #or author.empty?
+        if author.nil? #or author.empty?
           if page.collective_work?     
             # author = 'Συλλογικό έργο'
-            authors = ['Συλλογικό έργο']
+            author = ['Συλλογικό έργο']
           else
             # author = nil
             pp err_msg = "No author has been found at book: #{biblionet_id}" 
@@ -156,7 +149,7 @@ module Biblionet
           end
         end
 
-        book_hash['authors']      = authors
+        book_hash['author']       = author
         book_hash['contributors'] = contributors        
         book_hash['publisher']    = page.publisher
 
@@ -174,7 +167,7 @@ module Biblionet
         book_hash['isbn_13']          = details_hash['isbn_13'].nil? ? nil : details_hash['isbn_13']
         book_hash['status']           = details_hash['status']
         book_hash['price']            = details_hash['price']
-        book_hash['awards']           = details_hash['awards'] unless details_hash['awards'].nil?
+        book_hash['award']            = page.awards
 
 
         book_hash['description'] = page.description
@@ -191,7 +184,7 @@ module Biblionet
 
 
         book_hash['categories']   = ddcs
-        book_hash['biblionet_id'] = biblionet_id 
+        book_hash['b_id'] = biblionet_id 
 
         return @book = book_hash  
       end      
@@ -227,6 +220,16 @@ module Biblionet
         @nodeset.css('h1.book_title').text
       end
 
+      def subtitle
+        subtitle = nil
+        @nodeset.xpath("//h1[@class='book_title']").each do |item|
+          if item.next_element.name == 'br' and item.next_element.next.name != 'br'
+            subtitle = item.next_element.next.text.strip
+          end
+        end
+        subtitle
+      end
+
       def publisher
         @nodeset.xpath("//a[@class='booklink' and @href[contains(.,'/com/') ]][1]").text
       end
@@ -236,7 +239,10 @@ module Biblionet
         @nodeset.xpath("//a[@class='booklink' and @href[contains(.,'/author/') ]]").each do |item| 
           pre_text = item.previous.text.strip           
           contributors << pre_text unless pre_text == ',' or !pre_text.end_with? ':'
-          contributors << item.text
+          contributor = {}
+          contributor['name'] = item.text 
+          contributor['b_id'] = (item['href'].split("/"))[2]      
+          contributors << contributor
         end
         # Alternative way based on intersecting sets
         # set_A = "//a[@class='booklink' and @href[contains(.,'/com/') ]][1]/preceding::text()"
@@ -288,7 +294,17 @@ module Biblionet
         else
           false
         end
-      end      
+      end  
+
+      def awards
+        awards = []        
+        @nodeset.xpath("//a[@class='booklink' and @href[contains(.,'page=showaward') ]]").each do |item|
+          award = {'name' => item.text, 'year' => item.next_sibling.text.strip.gsub(/[^\d]/, '')}          
+          awards << award
+        end
+        
+        return awards
+      end    
 
     end
 
@@ -395,7 +411,37 @@ end
 #   f.write(book_json)
 # end
 
+# def contributors(n)
+#   contributors = []  
+#   n.xpath("//a[@class='booklink' and @href[contains(.,'/author/') ]]").each do |item| 
+#     pre_text = item.previous.text.strip           
+#     contributors << pre_text unless pre_text == ',' or !pre_text.end_with? ':'
+#     contributor = {}
+#     contributor['name'] = item.text 
+#     contributor['b_id'] = (item['href'].split("/"))[2]      
+#     contributors << contributor
+#   end       
+#   contributors
+# end  
 
+# c = contributors(n4)
 
+# def proccess_contributors(raw_contributors)
+#   contributors  = Hash.new
+#   partners      = Array.new
+#   job           = "author"
+#   raw_contributors.each do |cb|
+#     if cb.is_a?(String) and cb.end_with? ":"
+#       job = cb[0..-2]
+#       partners.clear
+#     else
+#       partners << cb
+#       contributors[job] =  partners.clone
+#     end  
+#   end unless raw_contributors.nil? or raw_contributors.empty?
+  
+#   return contributors
+# end
 
+# c2 = proccess_contributors(c)
 
