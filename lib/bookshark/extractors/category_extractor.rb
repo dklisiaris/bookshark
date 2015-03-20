@@ -3,24 +3,24 @@ require_relative 'base'
 module Biblionet
   module Extractors
 
-    class DDCExtractor < Base
-      attr_reader :ddcs
+    class CategoryExtractor < Base
+      attr_reader :categories
 
       def initialize(uri=nil)
         super(uri)        
-        extract_ddcs unless uri.nil?        
+        extract_categories unless uri.nil?        
       end
 
-      def extract_ddcs(ddc_page=@page)
-        page = Nokogiri::HTML(ddc_page)  
+      def extract_categories(category_page=@page)
+        page = Nokogiri::HTML(category_page)  
         parent, previous_indent, previous_id = nil, nil, nil,
 
-        @ddcs = page.xpath("//a[@class='menu' and @href[contains(.,'/index/') ]]").map do |ddc|      
+        @categories = page.xpath("//a[@class='menu' and @href[contains(.,'/index/') ]]").map do |category|      
           # Extract from href the id used by biblionet. --- DdC url http://biblionet.gr/index/id ---
-          biblionet_id = ddc['href'].split(/\//).last
+          biblionet_id = category['href'].split(/\//).last
 
           # Get the text before <a>. It is expected to be a number of space characters
-          spaces = ddc.previous_sibling.text # TODO: make sure text is only spaces           
+          spaces = category.previous_sibling.text # TODO: make sure text is only spaces           
           # Indent size
           indent = spaces.size
 
@@ -36,36 +36,36 @@ module Biblionet
           previous_id = biblionet_id
 
           # Extact DdC id and DdC text.     
-          ddc = proccess_ddc(ddc.text)
+          category = proccess_category(category.text)
 
-          ddc.merge!(parent: parent)
+          category.merge!(parent: parent)
           
-          ddc_hash = {biblionet_id => ddc.clone}
+          category_hash = {biblionet_id => category.clone}
         end.reduce({}, :update) unless @page.nil? 
         
-        return @ddcs  
+        return @categories  
       end
 
-      def extract_ddcs_from(uri=nil)
+      def extract_categories_from(uri=nil)
         load_page(uri)
-        extract_ddcs unless uri.nil?
+        extract_categories unless uri.nil?
       end
 
 
       private
 
-      def proccess_ddc(ddc)
+      def proccess_category(category)
         # matches the digits inside [] in text like: [889.09300] Νεοελληνική λογοτεχνία - Ιστορία και κριτική (300)  
         id_re = /(\[\d*(?:[\.|\s]\d*)*\])/
 
         # matches [digits] and (digits) in text like: [889.09300] Νεοελληνική λογοτεχνία - Ιστορία και κριτική (300)   
         non_text_re = /\s*(\[.*\]|\(\d*\))\s*/
         
-        ddc_id = ddc.scan(id_re).join.gsub(/[\[\]]/, '')
-        ddc_text = ddc.gsub(non_text_re, '').strip
+        category_id = category.scan(id_re).join.gsub(/[\[\]]/, '')
+        category_text = category.gsub(non_text_re, '').strip
 
-        ddc_hash = { ddc: ddc_id, text: ddc_text } 
-        return ddc_hash
+        category_hash = { ddc: category_id, name: category_text } 
+        return category_hash
       end
 
     end
@@ -73,7 +73,7 @@ module Biblionet
   end
 end
 
-# ddcp = DDCParser.new("raw_ddc_pages/0/ddc_787.html")
-# ddcp.extract_ddcs
+# categoryp = DDCParser.new("raw_category_pages/0/category_787.html")
+# categoryp.extract_categories
 
-# ddcp.filepath="ddc_1.html"
+# categoryp.filepath="category_1.html"

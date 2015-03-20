@@ -50,12 +50,13 @@ Extractor.new(format: 'json')
 Extractor.new(format: 'hash', site: 'biblionet')
 ```
 **Extractor Options**:
+
 * format : The format in which the extracted data are returned
-⋅⋅* hash (default)
-⋅⋅* json
-⋅⋅* pretty_json
+  * hash (default)
+  * json
+  * pretty_json
 * site : The site from where the metadata will be extracted
-⋅⋅* biblionet (default and currently the only available, so it can be skipped)
+  * biblionet (default and currently the only available, so it can be skipped)
 
 #### Extract Book Data
 
@@ -119,7 +120,7 @@ The expected result of a book extraction is something like this:
       "price": "16,31",
       "award": [
 
-      ]
+      ],
       "description": "Τι είναι πιο επικίνδυνο, ένα όπλο ή μια πισίνα; Τι κοινό έχουν οι δάσκαλοι με τους παλαιστές του σούμο;...",
       "categories": [
         {
@@ -243,7 +244,80 @@ The expected result of an author extraction is something like this:
   ]
 }
 ```
+#### Extract Categories
+Biblionet's categories are based on [Dewey Decimal Classification](http://en.wikipedia.org/wiki/Dewey_Decimal_Classification). It is possible to extract these categories also as seen below.
+```ruby
+# Create a new extractor object with pretty json format.
+extractor = Extractor.new(format: 'pretty_json')
 
+# Extract category with id 1041 from website
+extractor.category(id: 1041)
+
+# Extract category from the provided webpage 
+extractor.category(uri: 'http://biblionet.gr/index/1041/')
+
+# Extract category with id 1041 from local storage
+extractor.category(id: 1041, local: true)
+```
+**Categories Options**: (Pretty much the same as previous cases)
+* id : The id of category on the corresponding site (Integer)
+* uri : The url of category web page or the path to local file.
+* local : Boolean value. Has page been saved locally? (default is false) 
+
+Notice that when you are extracting a category you also extract parent categories and subcategories, thus you never extract just one category.
+
+The expected result of a category extraction is something like this:
+(Here the extracted category is the 1041, but parent and sub categories were also extracted.
+```json
+{
+  "category": [
+    {
+      "192": {
+        "ddc": "500",
+        "name": "Φυσικές και θετικές επιστήμες",
+        "parent": null
+      },
+      "1040": {
+        "ddc": "520",
+        "name": "Αστρονομία",
+        "parent": "192"
+      },
+      "1041": {
+        "ddc": "523",
+        "name": "Πλανήτες",
+        "parent": "1040"
+      },
+      "780": {
+        "ddc": "523.01",
+        "name": "Αστροφυσική",
+        "parent": "1041"
+      },
+      "2105": {
+        "ddc": "523.083",
+        "name": "Πλανήτες - Βιβλία για παιδιά",
+        "parent": "1041"
+      },
+      "576": {
+        "ddc": "523.1",
+        "name": "Κοσμολογία",
+        "parent": "1041"
+      }
+    }
+  ]
+}
+```
+### Where do IDs point?
+The id of each data type points to the corresponding type webpage
+Take a look at this table:
+
+| ID      | Data Type   | Target Webpage                   |
+|---------|:-----------:|----------------------------------|
+| 103788  | book        | http://biblionet.gr/book/103788  |
+| 10207   | author      | http://biblionet.gr/author/10207 |
+| 20      | publisher   | http://biblionet.gr/com/20       | 
+| 1041    | category    | http://biblionet.gr/index/1041   |
+
+So if you want to use the uri option provide the target webpage's url as seen above without any slugs after th id.
 
 ## Contributing
 

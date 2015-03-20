@@ -3,7 +3,7 @@ require 'bookshark/storage/file_manager'
 require 'require_all'
 
 require 'bookshark/extractors/author_extractor'
-require 'bookshark/extractors/ddc_extractor'
+require 'bookshark/extractors/category_extractor'
 require 'bookshark/extractors/book_extractor'
 require 'bookshark/extractors/publisher_extractor'
 
@@ -81,29 +81,38 @@ module Bookshark
       return response            
     end
 
-    def ddcs(uri=nil, options = {})
-      dp = Biblionet::Extractors::DDCExtractor.new
-      dp.extract_ddcs_from(uri)
+    def category(options = {})
+      uri = process_options(options, __method__)
+      options[:format] ||= @format
+
+      category_extractor = Biblionet::Extractors::CategoryExtractor.new
+      category = category_extractor.extract_categories_from(uri)
+
+      response = {}      
+      response['category'] = [category]
+      response = change_format(response, options[:format])
+      
+      return response        
     end
 
-    def parse_all_ddcs(will_save=false)
+    def parse_all_categories(will_save=false)
       # list_directories('raw_ddc_pages').each do |dir|
         # p dir
       # end
-      dp = Biblionet::Extractors::DDCExtractor.new
-      all_ddcs = Hash.new
+      category_extractor = Biblionet::Extractors::CategoryExtractor.new
+      all_categories = Hash.new
       
       list_files(path: 'storage/raw_ddc_pages', extension: 'html', all:true).each do |file|
-        ddcs = dp.extract_ddcs_from(file)                 
-        all_ddcs.merge!(ddcs) unless ddcs.nil? or ddcs.empty?
+        categories = category_extractor.extract_categories_from(file)                 
+        all_categories.merge!(categories) unless categories.nil? or categories.empty?
       end
 
       if will_save
-        all_ddcs_json = all_ddcs.to_json
-        save_to('storage/all_ddcs.json',all_ddcs_json)
+        all_categories_json = all_categories.to_json
+        save_to('storage/all_categories.json',all_categories_json)
       end
 
-      all_ddcs
+      all_categories
     end
 
     def parse_all_books
@@ -149,7 +158,7 @@ module Bookshark
         when 'book'
           url_method    = 'book'
           local_path    = "html_book_pages/#{((id-1)/1000)}/book_#{id}.html"
-        when 'ddcs'
+        when 'categories'
           url_method    = 'index' 
           local_path    = "html_ddc_pages/#{((id-1)/1000)}/ddc_#{id}.html"       
         else
@@ -214,9 +223,9 @@ module Bookshark
 #           bp.load_and_parse_book(uri)
 #         end
 
-#         def ddcs(uri=nil)
-#           dp = BiblionetParser::Core::DDCParser.new
-#           dp.extract_ddcs_from(uri)
+#         def categories(uri=nil)
+#           category_extractor = BiblionetParser::Core::DDCParser.new
+#           category_extractor.extract_categories_from(uri)
 #         end
 
 #       end
@@ -235,13 +244,13 @@ end
 # Biblionet::Extract.author('storage/html_author_pages/0/author_435.html')
 
 # bib = Bibliotheca.new
-# ddcs = bib.parse_all_ddcs(true)
+# categories = bib.parse_all_categories(true)
 
 # p bib.list_files(path: 'raw_html_pages/2', extension:'html')
 # p bib.list_directories
-# p ddcs[787]
-# ddcs = 'test'
-# bib.save_to('all_ddcs_test.json', ddcs)
+# p categories[787]
+# categories = 'test'
+# bib.save_to('all_categories_test.json', categories)
 
 # bp = BiblionetParser::Core::BookParser.new
 # bp.load_and_parse_book('storage/raw_html_pages/96/book_96592.html') # BAD Book --no image
@@ -275,9 +284,9 @@ end
 # puts JSON.pretty_generate(bp.book)
 
 # ddcp = BiblionetParser::Core::DDCParser.new('storage/raw_ddc_pages/0/ddc_298.html')
-# pp all = ddcp.ddcs
-# pp cur = ddcp.ddcs.values.last
-# pp sel = ddcp.ddcs["2703"]
+# pp all = ddcp.categories
+# pp cur = ddcp.categories.values.last
+# pp sel = ddcp.categories["2703"]
 
 # bp.parse_book('12351', bp.page)
 
