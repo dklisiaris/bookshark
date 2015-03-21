@@ -16,7 +16,7 @@ The representation of bibliographic metadata in JSON is inspired by [BibJSON](ht
 Add this line to your application's Gemfile:
 
 ```ruby
-gem 'bookshark'
+gem 'bookshark', "~> 1.0.0.alpha"
 ```
 
 And then execute:
@@ -81,9 +81,14 @@ extractor.book(id: 103788, local: true)
 ```
 
 **Book Options**: (Recommended option is to use just the id and let bookshark to generate uri):
+
 * id : The id of book on the corresponding site (Integer)
 * uri : The url of book web page or the path to local file.
 * local : Boolean value. Has page been saved locally? (default is false) 
+* format : The format in which the extracted data are returned
+  * hash (default)
+  * json
+  * pretty_json
 
 The expected result of a book extraction is something like this:
 ```json
@@ -194,9 +199,14 @@ extractor.publisher(uri: 'http://biblionet.gr/com/20/')
 extractor.publisher(id: 20, local: true)
 ```
 **Publisher Options**: (Recommended option is to use just the id and let bookshark to generate uri):
+
 * id : The id of publisher on the corresponding site (Integer)
 * uri : The url of publisher web page or the path to local file.
 * local : Boolean value. Has page been saved locally? (default is false) 
+* format : The format in which the extracted data are returned
+  * hash (default)
+  * json
+  * pretty_json
 
 The expected result of an author extraction is something like this:
 ```json
@@ -260,9 +270,14 @@ extractor.category(uri: 'http://biblionet.gr/index/1041/')
 extractor.category(id: 1041, local: true)
 ```
 **Categories Options**: (Pretty much the same as previous cases)
+
 * id : The id of category on the corresponding site (Integer)
 * uri : The url of category web page or the path to local file.
 * local : Boolean value. Has page been saved locally? (default is false) 
+* format : The format in which the extracted data are returned
+  * hash (default)
+  * json
+  * pretty_json
 
 Notice that when you are extracting a category you also extract parent categories and subcategories, thus you never extract just one category.
 
@@ -306,8 +321,95 @@ The expected result of a category extraction is something like this:
   ]
 }
 ```
+### Book Search
+Instead of providing the exact book id and extract that book directly, a search function can be used to get one or more books based on some parameters.
+```ruby
+# Create a new extractor object with pretty json format.
+extractor = Extractor.new(format: 'pretty_json')
+
+# Extract books with these words in title
+extractor.search(title: 'σημεια και τερατα')
+
+# Extract books with these words in title and this name in author
+extractor.search(title: 'χομπιτ', author: 'τολκιν')
+
+# Extract books from specific author, published after 1984
+extractor.search(author: 'arthur doyle', after_year: '2010')
+```
+Searching and extracting several books can be very slow at times, so instead of extracting every single book you may prefer only the ids of found books. In that case pass the option `results_type: 'ids'`.
+
+**Search Options**:  
+With enought options you can customize your query to your needs. It is recommended to use at least two of the search options.
+
+* title (The title of book to search)       
+* author (The author's last name is enough for filter the search)      
+* publisher
+* category
+* title_split
+  * 0 (The exact title phrase must by matched)
+  * 1 (Default - All the words in title must be matched in whatever order)   
+  * 2 (At least one word should match)
+* book_id (Providing id means only one book should returned)      
+* isbn         
+* author_id (ID of the selected author)    
+* publisher_id 
+* category_id  
+* after_year (Published this year or later)   
+* before_year (Published this year or before)   
+* results_type
+  * metadata (Default - Every book is extracted and an array of metadata is returned)
+  * ids (Only ids are returned)
+* format : The format in which the extracted data are returned
+  * hash (default)
+  * json
+  * pretty_json
+
+Results with ids option look like that:
+```json 
+{
+ "book": [
+    "119000",
+    "103788",
+    "87815",
+    "87812",
+    "15839",
+    "77381",
+    "46856",
+    "46763",
+    "33301"
+  ]
+}
+```
+Normally results are multiple books like the ones in book extractors:
+```json
+{
+  "book": [
+    {
+      "title": "Στης Χλόης τα απόκρυφα",
+      "subtitle": "…και άλλα σημεία και τέρατα",
+      "... Rest of Metadata ...": "... condensed ..."
+    },
+    {
+      "title": "Σημεία και τέρατα της οικονομίας",
+      "subtitle": "Η κρυφή πλευρά των πάντων",
+      "... Rest of Metadata ...": "... condensed ..."     
+    },
+    {
+      "title": "Και άλλα σημεία και τέρατα από την ιστορία",
+      "subtitle": null,
+      "... Rest of Metadata ...": "... condensed ..."
+    },
+    {
+      "title": "Σημεία και τέρατα από την ιστορία",
+      "subtitle": null,
+      "... Rest of Metadata ...": "... condensed ..."      
+    }
+  ]
+}
+```
+
 ### Where do IDs point?
-The id of each data type points to the corresponding type webpage
+The id of each data type points to the corresponding type webpage.
 Take a look at this table:
 
 | ID      | Data Type   | Target Webpage                   |

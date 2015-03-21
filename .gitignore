@@ -8,6 +8,7 @@
 /spec/reports/
 /tmp/
 /lib/bookshark/storage/html_publisher_pages/
+/lib/bookshark/logs/*
 *.bundle
 *.so
 *.o

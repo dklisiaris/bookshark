@@ -6,6 +6,7 @@ require 'bookshark/extractors/author_extractor'
 require 'bookshark/extractors/category_extractor'
 require 'bookshark/extractors/book_extractor'
 require 'bookshark/extractors/publisher_extractor'
+require 'bookshark/extractors/search'
 
 # require_all 'lib/bookshark/crawlers'
 # Dir["lib/bookshark/crawlers/*"].each {|file| require File.basename file, extn }
@@ -83,7 +84,7 @@ module Bookshark
 
     def category(options = {})
       uri = process_options(options, __method__)
-      options[:format] ||= @format
+      options[:format] ||= @format      
 
       category_extractor = Biblionet::Extractors::CategoryExtractor.new
       category = category_extractor.extract_categories_from(uri)
@@ -93,6 +94,20 @@ module Bookshark
       response = change_format(response, options[:format])
       
       return response        
+    end
+
+    def search(options = {})
+      options[:format]        ||= @format
+      options[:results_type]  ||= 'metadata'           
+
+      search_engine  = Biblionet::Extractors::Search.new
+      search_results = search_engine.perform_search(options)
+
+      response = {}      
+      response['book'] = search_results
+      response = change_format(response, options[:format])
+      
+      return response       
     end
 
     def parse_all_categories(will_save=false)
