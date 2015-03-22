@@ -141,7 +141,11 @@ module Biblionet
         # encoded_text = File.read(encoded_file_path)
         coder = HTMLEntities.new
         coder.decode(encoded_text)
-      end      
+      end
+
+      def present?(value)
+        return (not value.nil? and not value.empty?) ? true : false
+      end        
 
     end
 

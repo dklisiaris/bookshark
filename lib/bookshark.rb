@@ -47,7 +47,7 @@ module Bookshark
       author = author_extractor.load_and_extract_author(uri) 
           
       response = {}      
-      response['author'] = [author]
+      response[:author] = [author]
       response = change_format(response, options[:format])
       return response
     end
@@ -60,7 +60,7 @@ module Bookshark
       publisher = publisher_extractor.load_and_extract_publisher(uri)
       
       response = {}      
-      response['publisher'] = [publisher]
+      response[:publisher] = [publisher]
       response = change_format(response, options[:format])
       response = publisher_extractor.decode_text(response)
 
@@ -70,13 +70,18 @@ module Bookshark
 
     def book(options = {})
       uri = process_options(options, __method__)
-      options[:format] ||= @format
+      options[:format]  ||= @format
+      options[:eager]   ||= false
 
-      book_extractor = Biblionet::Extractors::BookExtractor.new
-      book = book_extractor.load_and_extract_book(uri)
+      if options[:eager]
+        book = eager_extract_book(uri)
+      else
+        book_extractor = Biblionet::Extractors::BookExtractor.new
+        book = book_extractor.load_and_extract_book(uri)
+      end
 
       response = {}      
-      response['book'] = [book]
+      response[:book] = [book]
       response = change_format(response, options[:format])
       
       return response            
@@ -90,7 +95,7 @@ module Bookshark
       category = category_extractor.extract_categories_from(uri)
 
       response = {}      
-      response['category'] = [category]
+      response[:category] = [category]
       response = change_format(response, options[:format])
       
       return response        
@@ -104,7 +109,7 @@ module Bookshark
       search_results = search_engine.perform_search(options)
 
       response = {}      
-      response['book'] = search_results
+      response[:book] = search_results
       response = change_format(response, options[:format])
       
       return response       
@@ -173,7 +178,7 @@ module Bookshark
         when 'book'
           url_method    = 'book'
           local_path    = "html_book_pages/#{((id-1)/1000)}/book_#{id}.html"
-        when 'categories'
+        when 'category'
           url_method    = 'index' 
           local_path    = "html_ddc_pages/#{((id-1)/1000)}/ddc_#{id}.html"       
         else
@@ -199,7 +204,45 @@ module Bookshark
         hash = JSON.pretty_generate(hash) 
       end
       return hash
-    end           
+    end    
+
+    def eager_extract_book(uri)
+      book_extractor      = Biblionet::Extractors::BookExtractor.new
+      author_extractor    = Biblionet::Extractors::AuthorExtractor.new
+      publisher_extractor = Biblionet::Extractors::PublisherExtractor.new
+      category_extractor  = Biblionet::Extractors::CategoryExtractor.new
+
+      book = book_extractor.load_and_extract_book(uri)
+
+      tmp_data = []                 
+      book[:author].each do |author|
+        tmp_data << author_extractor.load_and_extract_author("http://www.biblionet.gr/author/#{author[:b_id]}") 
+      end
+      book[:author] = tmp_data      
+      
+      tmp_data = []
+      tmp_hash = {}
+      book[:contributors].each do |job, contributors|
+        contributors.each do |contributor|
+          tmp_data << author_extractor.load_and_extract_author("http://www.biblionet.gr/author/#{contributor[:b_id]}")
+        end
+        tmp_hash[job] = tmp_data
+        tmp_data = []
+      end
+      book[:contributors] = tmp_hash
+
+      tmp_data = []
+      tmp_hash = {}
+      book[:category].each do |category|
+        tmp_data << category_extractor.extract_categories_from("http://www.biblionet.gr/index/#{category[:b_id]}")
+      end
+      book[:category] = tmp_data 
+      
+      tmp_data = []      
+      book[:publisher] = publisher_extractor.load_and_extract_publisher("http://www.biblionet.gr/com/#{book[:publisher][:b_id]}")
+
+      book
+    end       
   
   end
 

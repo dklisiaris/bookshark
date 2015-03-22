@@ -80,7 +80,8 @@ extractor.book(uri: 'http://biblionet.gr/book/103788/')
 extractor.book(id: 103788, local: true)
 ```
 
-**Book Options**: (Recommended option is to use just the id and let bookshark to generate uri):
+**Book Options** 
+(Recommended option is to use just the id and let bookshark to generate uri):
 
 * id : The id of book on the corresponding site (Integer)
 * uri : The url of book web page or the path to local file.
@@ -89,6 +90,19 @@ extractor.book(id: 103788, local: true)
   * hash (default)
   * json
   * pretty_json
+* eager : Perform eager extraction? (Boolean - default is false)
+
+**Eager Extraction:**
+
+Each book has some attributes such as authors, contributors, categories etc which are actually references to other objects.   
+By default when extracting a book, you get only names of these objects and references to their pages.   
+With eager option set to true, each of these objects' data is extracted and the produced output contains complete information about every object.   
+Eager extraction doesn't work with local option enabled.
+
+```ruby
+# Extract book with id 103788 with eager extraction option enabled
+extractor.book(id: 103788, eager: true)
+```
 
 The expected result of a book extraction is something like this:
 ```json
@@ -116,7 +130,11 @@ The expected result of a book extraction is something like this:
           }
         ]
       },
-      "publisher": "Εκδοτικός Οίκος Α. Α. Λιβάνη",
+      "publisher": {
+        "name": "Εκδοτικός Οίκος Α. Α. Λιβάνη",
+        "b_id": "271"
+      },
+
       "publication_year": "2006",
       "pages": "326",
       "isbn": "960-14-1157-7",
@@ -127,7 +145,7 @@ The expected result of a book extraction is something like this:
 
       ],
       "description": "Τι είναι πιο επικίνδυνο, ένα όπλο ή μια πισίνα; Τι κοινό έχουν οι δάσκαλοι με τους παλαιστές του σούμο;...",
-      "categories": [
+      "category": [
         {
           "ddc": "330",
           "text": "Οικονομία",
@@ -139,7 +157,7 @@ The expected result of a book extraction is something like this:
   ]
 }
 ```
-
+Here is a [Book Sample](https://gist.github.com/dklisiaris/a6f3d6f37806186f3c79) extracted with eager option enabled.
 
 #### Extract Author Data
 
@@ -316,10 +334,18 @@ The expected result of a category extraction is something like this:
         "ddc": "523.1",
         "name": "Κοσμολογία",
         "parent": "1041"
+      },
+      "current": {
+        "ddc": "523",
+        "name": "Πλανήτες",
+        "parent": "1040",
+        "b_id": "1041"
       }
     }
   ]
 }
+Notice that the last item is the current category. The rest is the category tree.
+
 ```
 ### Book Search
 Instead of providing the exact book id and extract that book directly, a search function can be used to get one or more books based on some parameters.

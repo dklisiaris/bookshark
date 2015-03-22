@@ -24,7 +24,7 @@ module Biblionet
       def proccess_contributors(raw_contributors)
         contributors  = Hash.new
         partners      = Array.new
-        job           = "author"
+        job           = :author
         raw_contributors.each do |cb|
           if cb.is_a?(String) and cb.end_with? ":"
             job = cb[0..-2]
@@ -49,35 +49,35 @@ module Biblionet
           begin
             if detail =~ date_regex
               #puts "Publication Year: #{detail}"
-              details_hash['publication_year'] = detail
+              details_hash[:publication_year] = detail
             elsif detail.end_with? "σελ."
               pages = detail.gsub(/[^\d]/, '')
               #puts "Pages: #{pages}"
-              details_hash['pages'] = pages
+              details_hash[:pages] = pages
             elsif detail.start_with? "ISBN-13"
               isbn_13 = detail.gsub(/ISBN-13 /, "")
-              details_hash['isbn_13'] = isbn_13
+              details_hash[:isbn_13] = isbn_13
               #puts "ISBN: #{isbn_13}"      
             elsif detail.start_with? "ISBN"
               isbn = detail.gsub(/ISBN /, "")
               #puts "ISBN: #{isbn}"
-              details_hash['isbn'] = isbn
+              details_hash[:isbn] = isbn
             elsif detail =~ status_regex
               status = detail.gsub(/\[|\]/, '')
               #puts "Status: #{status}"
-              details_hash['status'] = status
+              details_hash[:status] = status
             elsif detail.start_with? "Τιμή"
               price = detail.gsub(/[^\d,\d]/, '')
               #puts "Price: #{price}"
-              details_hash['price'] = price
+              details_hash[:price] = price
             elsif detail.start_with? '<img src="/images/award.jpg" border="0" title="Βραβείο">'
               award = Sanitize.clean(detail).strip
-              details_hash['awards'] = [] if details_hash['awards'].nil?
-              details_hash['awards'] << award
+              details_hash[:awards] = [] if details_hash[:awards].nil?
+              details_hash[:awards] << award
             elsif detail.start_with? "ISMN" #Special typo case
               isbn = detail.gsub(/ISMN /, "")
               #puts "ISBN: #{isbn}"
-              details_hash['isbn'] = isbn              
+              details_hash[:isbn] = isbn              
             else 
               raise NoIdeaWhatThisIsError.new(@biblionet_id, detail)
             end
@@ -105,7 +105,7 @@ module Biblionet
         # Gets text by reomoving anything but text.
         ddc_text = ddc.gsub(non_text_re, '').strip
 
-        ddc_hash = { ddc: ddc_id, text: ddc_text } 
+        ddc_hash = { ddc: ddc_id, name: ddc_text } 
         return ddc_hash
       end  
 
@@ -128,14 +128,14 @@ module Biblionet
           log.error(err_msg)                            
         end
 
-        book_hash['title'] = page.title 
-        book_hash['subtitle'] = page.subtitle        
-        book_hash['image'] = img                          
+        book_hash[:title] = page.title 
+        book_hash[:subtitle] = page.subtitle        
+        book_hash[:image] = img                          
       
         contributors = proccess_contributors(page.contributors)
 
-        author = contributors['author']
-        contributors.delete('author')
+        author = contributors[:author]
+        contributors.delete(:author)
         
         # If author is empty, maybe its a collective work.
         if author.nil? #or author.empty?
@@ -149,9 +149,9 @@ module Biblionet
           end
         end
 
-        book_hash['author']       = author
-        book_hash['contributors'] = contributors        
-        book_hash['publisher']    = page.publisher
+        book_hash[:author]       = author
+        book_hash[:contributors] = contributors        
+        book_hash[:publisher]    = page.publisher
 
         details = page.details
         if details.nil?
@@ -161,20 +161,20 @@ module Biblionet
 
         details_hash = proccess_details(details)
 
-        book_hash['publication_year'] = details_hash['publication_year']
-        book_hash['pages']            = details_hash['pages']
-        book_hash['isbn']             = details_hash['isbn']
-        book_hash['isbn_13']          = details_hash['isbn_13'].nil? ? nil : details_hash['isbn_13']
-        book_hash['status']           = details_hash['status']
-        book_hash['price']            = details_hash['price']
-        book_hash['award']            = page.awards
+        book_hash[:publication_year] = details_hash[:publication_year]
+        book_hash[:pages]            = details_hash[:pages]
+        book_hash[:isbn]             = details_hash[:isbn]
+        book_hash[:isbn_13]          = details_hash[:isbn_13].nil? ? nil : details_hash[:isbn_13]
+        book_hash[:status]           = details_hash[:status]
+        book_hash[:price]            = details_hash[:price]
+        book_hash[:award]            = page.awards
 
 
-        book_hash['description'] = page.description
+        book_hash[:description] = page.description
 
         ddcs = page.ddcs.map do |ddc|      
                 # Extract from href the ddc id used by biblionet. --- DdC url http://biblionet.gr/index/id ---
-                ddc_biblionet_id = ddc['href'].split(/\//).last
+                ddc_biblionet_id = ddc[:href].split(/\//).last
                 # Extact DdC id and DdC text.     
                 ddc = proccess_ddc(ddc.text)
 
@@ -183,8 +183,8 @@ module Biblionet
               end
 
 
-        book_hash['categories']   = ddcs
-        book_hash['b_id'] = biblionet_id 
+        book_hash[:category]   = ddcs
+        book_hash[:b_id] = biblionet_id 
 
         return @book = book_hash  
       end      
@@ -211,7 +211,7 @@ module Biblionet
           img_node = img_candidate unless img_candidate.nil? or img_candidate.empty?                        
         end                    
 
-        img = img_node.nil? ? nil : BASE_URL+(img_node.first)['src']                             
+        img = img_node.nil? ? nil : BASE_URL+(img_node.first)[:src]                             
 
         return img 
       end
@@ -231,7 +231,12 @@ module Biblionet
       end
 
       def publisher
-        @nodeset.xpath("//a[@class='booklink' and @href[contains(.,'/com/') ]][1]").text
+        publisher_hash = {}
+        @nodeset.xpath("//a[@class='booklink' and @href[contains(.,'/com/') ]]").each do |item| 
+          publisher_hash[:name] = item.text
+          publisher_hash[:b_id] = (item[:href].split("/"))[2]
+        end
+        publisher_hash
       end
 
       def contributors
@@ -240,8 +245,8 @@ module Biblionet
           pre_text = item.previous.text.strip           
           contributors << pre_text unless pre_text == ',' or !pre_text.end_with? ':'
           contributor = {}
-          contributor['name'] = item.text 
-          contributor['b_id'] = (item['href'].split("/"))[2]      
+          contributor[:name] = item.text 
+          contributor[:b_id] = (item[:href].split("/"))[2]      
           contributors << contributor
         end
         # Alternative way based on intersecting sets
@@ -299,7 +304,7 @@ module Biblionet
       def awards
         awards = []        
         @nodeset.xpath("//a[@class='booklink' and @href[contains(.,'page=showaward') ]]").each do |item|
-          award = {'name' => item.text, 'year' => item.next_sibling.text.strip.gsub(/[^\d]/, '')}          
+          award = {name: item.text, year: item.next_sibling.text.strip.gsub(/[^\d]/, '')}          
           awards << award
         end
         
@@ -391,7 +396,7 @@ end
 
 # ddcs = page.xpath("//a[@class='subjectlink' and @href[contains(.,'/index/') ]]").map do |ddc|      
 #         # Extract from href the ddc id used by biblionet. --- DdC url http://biblionet.gr/index/id ---
-#         ddc_biblionet_id = ddc['href'].split(/\//).last
+#         ddc_biblionet_id = ddc[:href].split(/\//).last
 #         # Extact DdC id and DdC text.     
 #         ddc = proccess_ddc(ddc.text)
 
@@ -418,7 +423,7 @@ end
 #     contributors << pre_text unless pre_text == ',' or !pre_text.end_with? ':'
 #     contributor = {}
 #     contributor['name'] = item.text 
-#     contributor['b_id'] = (item['href'].split("/"))[2]      
+#     contributor['b_id'] = (item[:href].split("/"))[2]      
 #     contributors << contributor
 #   end       
 #   contributors

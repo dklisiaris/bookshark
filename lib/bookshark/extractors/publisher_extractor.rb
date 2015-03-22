@@ -26,10 +26,10 @@ module Biblionet
         bookstores['Έδρα']              = headquarters 
 
         publisher_hash = {}
-        publisher_hash['name']          = page.name
-        publisher_hash['owner']         = page.owner       
-        publisher_hash['bookstores']    = bookstores
-        publisher_hash['b_id']          = biblionet_id
+        publisher_hash[:name]          = page.name
+        publisher_hash[:owner]         = page.owner       
+        publisher_hash[:bookstores]    = bookstores
+        publisher_hash[:b_id]          = biblionet_id
 
         return @publisher = publisher_hash
       end
@@ -85,9 +85,9 @@ module Biblionet
         end
 
         # Change keys. Use the same as in bookstores.
-        mappings                      = {"Διεύθυνση" => "address", "Τηλ" => "telephone", "FAX" => "fax", "E-mail" => "email", "Web site" => "website"}
+        mappings                      = {"Διεύθυνση" => :address, "Τηλ" => :telephone, "FAX" => :fax, "E-mail" => :email, "Web site" => :website}
         headquarters_hash             = Hash[headquarters_hash.map {|k, v| [mappings[k], v] }]
-        headquarters_hash['website']  = headquarters_hash['website'].split(',').map(&:strip) if headquarters_hash['website'].include? ','
+        headquarters_hash[:website]  = headquarters_hash[:website].split(',').map(&:strip) if headquarters_hash[:website].include? ','
 
         return headquarters_hash                
       end
@@ -111,20 +111,20 @@ module Biblionet
             address_array = []
             tel_array     = []
           elsif (item.start_with?("Fax") or item.start_with?("fax")) and item =~ regex_tel            
-            bookstores_hash[key]['fax']        = item.gsub(/[^\d{3} \d{2}]/, '').strip            
+            bookstores_hash[key][:fax]        = item.gsub(/[^\d{3} \d{2}]/, '').strip            
           elsif item =~ regex_tel
             tel_array << item.gsub(/[^\d{3} \d{2}]/, '').strip            
-            bookstores_hash[key]['telephone']  = tel_array            
+            bookstores_hash[key][:telephone]  = tel_array            
           elsif item =~ regex_tk
             address_array << item.gsub(/,$/, '').strip                       
-            bookstores_hash[key]['address']    = address_array            
+            bookstores_hash[key][:address]    = address_array            
           elsif item =~ regex_email            
-            bookstores_hash[key]['email']      = (regex_email.match(item))[0]                        
+            bookstores_hash[key][:email]      = (regex_email.match(item))[0]                        
           elsif item =~ regex_url            
-            bookstores_hash[key]['website']    = item[regex_url,1]            
+            bookstores_hash[key][:website]    = item[regex_url,1]            
           else
             address_array << item.gsub(/,$/, '').strip            
-            bookstores_hash[key]['address']    = address_array            
+            bookstores_hash[key][:address]    = address_array            
           end
 
         end

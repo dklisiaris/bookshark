@@ -17,7 +17,7 @@ module Biblionet
 
         @categories = page.xpath("//a[@class='menu' and @href[contains(.,'/index/') ]]").map do |category|      
           # Extract from href the id used by biblionet. --- DdC url http://biblionet.gr/index/id ---
-          biblionet_id = category['href'].split(/\//).last
+          biblionet_id = category[:href].split(/\//).last
 
           # Get the text before <a>. It is expected to be a number of space characters
           spaces = category.previous_sibling.text # TODO: make sure text is only spaces           
@@ -41,7 +41,10 @@ module Biblionet
           category.merge!(parent: parent)
           
           category_hash = {biblionet_id => category.clone}
-        end.reduce({}, :update) unless @page.nil? 
+        end.reduce({}, :update) unless @page.nil?               
+
+        @categories[:current] = (@categories[@biblionet_id.to_s].clone)
+        @categories[:current][:b_id] = @biblionet_id
         
         return @categories  
       end
@@ -56,15 +59,15 @@ module Biblionet
 
       def proccess_category(category)
         # matches the digits inside [] in text like: [889.09300] Νεοελληνική λογοτεχνία - Ιστορία και κριτική (300)  
-        id_re = /(\[\d*(?:[\.|\s]\d*)*\])/
+        ddc_re = /(\[\d*(?:[\.|\s]\d*)*\])/
 
         # matches [digits] and (digits) in text like: [889.09300] Νεοελληνική λογοτεχνία - Ιστορία και κριτική (300)   
         non_text_re = /\s*(\[.*\]|\(\d*\))\s*/
         
-        category_id = category.scan(id_re).join.gsub(/[\[\]]/, '')
-        category_text = category.gsub(non_text_re, '').strip
+        category_ddc = category.scan(ddc_re).join.gsub(/[\[\]]/, '')
+        category_name = category.gsub(non_text_re, '').strip
 
-        category_hash = { ddc: category_id, name: category_text } 
+        category_hash = { ddc: category_ddc, name: category_name } 
         return category_hash
       end
 
