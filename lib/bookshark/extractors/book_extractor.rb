@@ -111,8 +111,9 @@ module Biblionet
 
 
       def extract_book(biblionet_id=@biblionet_id, book_page=@page)                
-        log = Logger.new(File.new(File.dirname(__dir__).to_s + "/logs/book_parsing.log",'a+'))
-                
+        # log = Logger.new(File.new(File.dirname(__dir__).to_s + "/logs/book_parsing.log",'a+'))
+        log = Logger.new(STDOUT)
+               
         page = BookDataExtractor.new(book_page)
 
         book_hash = Hash.new      
@@ -138,14 +139,14 @@ module Biblionet
         contributors.delete(:author)
         
         # If author is empty, maybe its a collective work.
-        if author.nil? #or author.empty?
+        if author.nil? or author.empty?
           if page.collective_work?     
             # author = 'Συλλογικό έργο'
             author = ['Συλλογικό έργο']
-          else
-            # author = nil
+          else            
             pp err_msg = "No author has been found at book: #{biblionet_id}" 
-            log.error(err_msg)             
+            log.warn(err_msg)   
+            author = []          
           end
         end
 

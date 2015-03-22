@@ -1,17 +1,11 @@
 # Bookshark
 ![Bookshark Logo](https://dl.dropboxusercontent.com/u/4888041/bookshark/logo.png)
 
----------------------------------------------------------------------------------------------------
-
-  NOTICE: This library is __under heavy development__, but is not funtional yet. Version 1.0.0.alpha will be ready soon.
-  
----------------------------------------------------------------------------------------------------
-
 A ruby library for book metadata extraction from biblionet.gr which
 extracts books, authors, publishers and ddc metatdata.
 The representation of bibliographic metadata in JSON is inspired by [BibJSON](http://okfnlabs.org/bibjson/) but some tags may be different.
 
-## Installation(not working yet)
+## Installation
 
 Add this line to your application's Gemfile:
 
@@ -25,12 +19,14 @@ And then execute:
 
 Or install it yourself as:
 
-    $ gem install bookshark
+    $ gem install bookshark --pre
 
-## Usage
-Include bookshark in your class/module.
+Require and include bookshark in your class/module.
 ```ruby
-include Bookshark
+require 'bookshark'
+class Foo
+  include Bookshark
+end
 ```
 Alternatively you can use this syntax
 ```ruby
@@ -41,7 +37,8 @@ include Bookshark
 Extractor.new
 ```
 
-### Extractor
+## Extractor
+An extractor object must be created in order to perform any metadata extractions.
 
 Create an extractor object
 ```ruby
@@ -58,7 +55,7 @@ Extractor.new(format: 'hash', site: 'biblionet')
 * site : The site from where the metadata will be extracted
   * biblionet (default and currently the only available, so it can be skipped)
 
-#### Extract Book Data
+### Extract Book Data
 
 You need book's id on biblionet website or its uri.
 Currently more advanced search functions based on title and author are not available, but they will be until the stable version 1.0.0 release.
@@ -92,7 +89,7 @@ extractor.book(id: 103788, local: true)
   * pretty_json
 * eager : Perform eager extraction? (Boolean - default is false)
 
-**Eager Extraction:**
+#### Eager Extraction
 
 Each book has some attributes such as authors, contributors, categories etc which are actually references to other objects.   
 By default when extracting a book, you get only names of these objects and references to their pages.   
@@ -159,7 +156,7 @@ The expected result of a book extraction is something like this:
 ```
 Here is a [Book Sample](https://gist.github.com/dklisiaris/a6f3d6f37806186f3c79) extracted with eager option enabled.
 
-#### Extract Author Data
+### Extract Author Data
 
 You need author's id on biblionet website or his uri
 ```ruby
@@ -201,7 +198,7 @@ The expected result of an author extraction is something like this:
 The convention here is that there is never just a single author, but instead the author hash is stored inside an array. 
 So, it is easy to include metadata for multiple authors or even for multiple types of entities such as publishers or books on the same json file.
 
-#### Extract Publisher Data
+### Extract Publisher Data
 Methods are pretty same as author:
 ```ruby
 # Create a new extractor object with pretty json format.
@@ -272,7 +269,7 @@ The expected result of an author extraction is something like this:
   ]
 }
 ```
-#### Extract Categories
+### Extract Categories
 Biblionet's categories are based on [Dewey Decimal Classification](http://en.wikipedia.org/wiki/Dewey_Decimal_Classification). It is possible to extract these categories also as seen below.
 ```ruby
 # Create a new extractor object with pretty json format.

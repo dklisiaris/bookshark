@@ -1,15 +1,11 @@
 require "bookshark/version"
 require 'bookshark/storage/file_manager'
-require 'require_all'
 
 require 'bookshark/extractors/author_extractor'
 require 'bookshark/extractors/category_extractor'
 require 'bookshark/extractors/book_extractor'
 require 'bookshark/extractors/publisher_extractor'
 require 'bookshark/extractors/search'
-
-# require_all 'lib/bookshark/crawlers'
-# Dir["lib/bookshark/crawlers/*"].each {|file| require File.basename file, extn }
 
 require 'bookshark/crawlers/base'
 require 'bookshark/crawlers/publisher_crawler'
