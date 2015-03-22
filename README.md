@@ -357,10 +357,13 @@ extractor = Extractor.new(format: 'pretty_json')
 extractor.search(title: 'σημεια και τερατα')
 
 # Extract books with these words in title and this name in author
-extractor.search(title: 'χομπιτ', author: 'τολκιν')
+extractor.search(title: 'χομπιτ', author: 'τολκιν', results_type: 'metadata')
 
 # Extract books from specific author, published after 1984
 extractor.search(author: 'arthur doyle', after_year: '2010')
+
+# Extract ids of books books with these words in title and this name in author
+extractor.search(title: 'αρχοντας', author: 'τολκιν', results_type: 'ids')
 ```
 Searching and extracting several books can be very slow at times, so instead of extracting every single book you may prefer only the ids of found books. In that case pass the option `results_type: 'ids'`.
 

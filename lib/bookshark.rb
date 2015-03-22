@@ -69,20 +69,22 @@ module Bookshark
     end    
 
     def book(options = {})
+      book_extractor = Biblionet::Extractors::BookExtractor.new
+
       uri = process_options(options, __method__)
       options[:format]  ||= @format
       options[:eager]   ||= false
-
+      
       if options[:eager]
         book = eager_extract_book(uri)
-      else
-        book_extractor = Biblionet::Extractors::BookExtractor.new
+      else        
         book = book_extractor.load_and_extract_book(uri)
       end
 
       response = {}      
       response[:book] = [book]
       response = change_format(response, options[:format])
+      response = book_extractor.decode_text(response)
       
       return response            
     end
@@ -220,8 +222,7 @@ module Bookshark
       end
       book[:author] = tmp_data      
       
-      tmp_data = []
-      tmp_hash = {}
+      tmp_data, tmp_hash = [], {}      
       book[:contributors].each do |job, contributors|
         contributors.each do |contributor|
           tmp_data << author_extractor.load_and_extract_author("http://www.biblionet.gr/author/#{contributor[:b_id]}")
@@ -231,15 +232,15 @@ module Bookshark
       end
       book[:contributors] = tmp_hash
 
-      tmp_data = []
-      tmp_hash = {}
+      tmp_data, tmp_hash = [], {} 
       book[:category].each do |category|
         tmp_data << category_extractor.extract_categories_from("http://www.biblionet.gr/index/#{category[:b_id]}")
       end
       book[:category] = tmp_data 
       
-      tmp_data = []      
-      book[:publisher] = publisher_extractor.load_and_extract_publisher("http://www.biblionet.gr/com/#{book[:publisher][:b_id]}")
+      tmp_data = [] 
+      tmp_data << publisher_extractor.load_and_extract_publisher("http://www.biblionet.gr/com/#{book[:publisher][:b_id]}")  
+      book[:publisher] = tmp_data
 
       book
     end       
