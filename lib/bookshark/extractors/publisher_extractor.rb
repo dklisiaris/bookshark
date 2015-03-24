@@ -21,6 +21,8 @@ module Biblionet
         puts "Extracting publisher: #{biblionet_id}"
         page = PublisherDataExtractor.new(publisher_page)
         
+        return nil if page.nodeset.nil?
+                
         headquarters                    = page.headquarters
         bookstores                      = page.bookstores
         bookstores['Έδρα']              = headquarters 
@@ -46,9 +48,14 @@ module Biblionet
         if (content_re.match(document)).nil?
           puts document
         end
-        content = content_re.match(document)[0]
+        content = content_re.match(document)[0] unless (content_re.match(document)).nil?
 
-        @nodeset = Nokogiri::HTML(content)        
+        # If content is nil, there is something wrong with the html, so return nil
+        if content.nil?
+          @nodeset = nil
+        else
+          @nodeset = Nokogiri::HTML(content)
+        end                 
       end  
 
       def name

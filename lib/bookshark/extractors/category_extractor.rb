@@ -8,7 +8,7 @@ module Biblionet
 
       def initialize(uri=nil)
         super(uri)        
-        extract_categories unless uri.nil?        
+        extract_categories unless uri.nil? or @page.nil?         
       end
 
       def extract_categories(category_page=@page)
@@ -43,15 +43,18 @@ module Biblionet
           category_hash = {biblionet_id => category.clone}
         end.reduce({}, :update) unless @page.nil?               
 
-        @categories[:current] = (@categories[@biblionet_id.to_s].clone)
-        @categories[:current][:b_id] = @biblionet_id
-        
-        return @categories  
+        if present?(@categories)
+          @categories[:current] = (@categories[@biblionet_id.to_s].clone)
+          @categories[:current][:b_id] = @biblionet_id
+          return @categories
+        else
+          return nil
+        end                
       end
 
       def extract_categories_from(uri=nil)
         load_page(uri)
-        extract_categories unless uri.nil?
+        extract_categories unless uri.nil? or @page.nil? 
       end
 
 

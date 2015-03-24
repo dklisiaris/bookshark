@@ -9,12 +9,12 @@ module Biblionet
 
       def initialize(uri=nil)
         super(uri)        
-        extract_book unless uri.nil?        
+        extract_book unless uri.nil? or @page.nil?        
       end
 
       def load_and_extract_book(uri=nil)
         load_page(uri)
-        extract_book unless uri.nil?
+        extract_book unless uri.nil? or @page.nil?
       end      
 
       # Converts the parsed contributors string to hash. 
@@ -116,6 +116,10 @@ module Biblionet
                
         page = BookDataExtractor.new(book_page)
 
+        # End extraction if BookDataExtractor couldnt create a nodeset
+        return nil if page.nodeset.nil?
+
+
         book_hash = Hash.new      
 
         begin                
@@ -200,9 +204,14 @@ module Biblionet
         if (content_re.match(document)).nil?
           puts document
         end
-        content = content_re.match(document)[0]
-
-        @nodeset = Nokogiri::HTML(content)        
+        content = content_re.match(document)[0] unless (content_re.match(document)).nil?
+        
+        # If content is nil, there is something wrong with the html, so return nil
+        if content.nil?
+          @nodeset = nil
+        else
+          @nodeset = Nokogiri::HTML(content) 
+        end        
       end
 
       def image

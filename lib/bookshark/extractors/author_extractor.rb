@@ -43,7 +43,12 @@ module Biblionet
 
         # puts JSON.pretty_generate(author_hash)
 
-        return @author = author_hash
+        if author_hash[:lastname].nil? and author_hash[:firstname].nil?
+          return nil
+        else
+          return @author = author_hash
+        end
+
       end
 
       def split_name(fullname)
@@ -81,7 +86,7 @@ module Biblionet
         if (content_re.match(document)).nil?
           puts document
         end
-        content = content_re.match(document)[0]
+        content = content_re.match(document)[0] unless (content_re.match(document)).nil?
 
         @nodeset = Nokogiri::HTML(content)        
       end  
