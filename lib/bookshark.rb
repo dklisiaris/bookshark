@@ -43,7 +43,7 @@ module Bookshark
       author = author_extractor.load_and_extract_author(uri) 
           
       response = {}      
-      response[:author] = [author]
+      response[:author] = !author.nil? ? [author] : []
       response = change_format(response, options[:format])
       return response
     end
@@ -56,7 +56,7 @@ module Bookshark
       publisher = publisher_extractor.load_and_extract_publisher(uri)
       
       response = {}      
-      response[:publisher] = [publisher]
+      response[:publisher] = !publisher.nil? ? [publisher] : []
       response = change_format(response, options[:format])
       response = publisher_extractor.decode_text(response)
 
@@ -78,7 +78,7 @@ module Bookshark
       end
 
       response = {}      
-      response[:book] = [book]
+      response[:book] = !book.nil? ? [book] : []
       response = change_format(response, options[:format])
       response = book_extractor.decode_text(response)
       
@@ -93,7 +93,7 @@ module Bookshark
       category = category_extractor.extract_categories_from(uri)
 
       response = {}      
-      response[:category] = [category]
+      response[:category] = !category.nil? ? [category] : []
       response = change_format(response, options[:format])
       
       return response        
