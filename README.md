@@ -65,6 +65,7 @@ First create an extractor object:
 extractor = Extractor.new(format: 'pretty_json')
 ```
 Then you can extract books
+
 ```ruby
 # Extract book with id 103788 from website
 extractor.book(id: 103788)
