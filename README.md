@@ -22,6 +22,7 @@ Or install it yourself as:
     $ gem install bookshark --pre
 
 Require and include bookshark in your class/module.
+
 ```ruby
 require 'bookshark'
 class Foo
@@ -29,6 +30,7 @@ class Foo
 end
 ```
 Alternatively you can use this syntax
+
 ```ruby
 Bookshark::Extractor.new
 
@@ -41,6 +43,7 @@ Extractor.new
 An extractor object must be created in order to perform any metadata extractions.
 
 Create an extractor object
+
 ```ruby
 Extractor.new
 Extractor.new(format: 'json')
@@ -102,6 +105,7 @@ extractor.book(id: 103788, eager: true)
 ```
 
 The expected result of a book extraction is something like this:
+
 ```json
 {
   "book": [
@@ -131,7 +135,6 @@ The expected result of a book extraction is something like this:
         "name": "Εκδοτικός Οίκος Α. Α. Λιβάνη",
         "b_id": "271"
       },
-
       "publication_year": "2006",
       "pages": "326",
       "isbn": "960-14-1157-7",
@@ -139,7 +142,6 @@ The expected result of a book extraction is something like this:
       "status": "Κυκλοφορεί",
       "price": "16,31",
       "award": [
-
       ],
       "description": "Τι είναι πιο επικίνδυνο, ένα όπλο ή μια πισίνα; Τι κοινό έχουν οι δάσκαλοι με τους παλαιστές του σούμο;...",
       "category": [
@@ -159,11 +161,13 @@ Here is a [Book Sample](https://gist.github.com/dklisiaris/a6f3d6f37806186f3c79)
 ### Extract Author Data
 
 You need author's id on biblionet website or his uri
+
 ```ruby
 Extractor.new.author(id: 10207)
 Extractor.new(format: 'json').author(uri: 'http://www.biblionet.gr/author/10207/')
 ```
 Extraction from local saved html pages is also possible, but not recommended
+
 ```ruby
 extractor = Extractor.new(format: 'json')
 extractor.author(uri: 'storage/html_author_pages/2/author_2423.html', local: true)
@@ -174,6 +178,7 @@ extractor.author(uri: 'storage/html_author_pages/2/author_2423.html', local: tru
 * local : Boolean value. Has page been saved locally? (default is false) 
 
 The expected result of an author extraction is something like this:
+
 ```json
 {
   "author": [
@@ -200,6 +205,7 @@ So, it is easy to include metadata for multiple authors or even for multiple typ
 
 ### Extract Publisher Data
 Methods are pretty same as author:
+
 ```ruby
 # Create a new extractor object with pretty json format.
 extractor = Extractor.new(format: 'pretty_json')
@@ -224,6 +230,7 @@ extractor.publisher(id: 20, local: true)
   * pretty_json
 
 The expected result of an author extraction is something like this:
+
 ```json
 {
   "publisher": [
@@ -271,6 +278,7 @@ The expected result of an author extraction is something like this:
 ```
 ### Extract Categories
 Biblionet's categories are based on [Dewey Decimal Classification](http://en.wikipedia.org/wiki/Dewey_Decimal_Classification). It is possible to extract these categories also as seen below.
+
 ```ruby
 # Create a new extractor object with pretty json format.
 extractor = Extractor.new(format: 'pretty_json')
@@ -298,6 +306,7 @@ Notice that when you are extracting a category you also extract parent categorie
 
 The expected result of a category extraction is something like this:
 (Here the extracted category is the 1041, but parent and sub categories were also extracted.
+
 ```json
 {
   "category": [
@@ -341,11 +350,12 @@ The expected result of a category extraction is something like this:
     }
   ]
 }
+```
 Notice that the last item is the current category. The rest is the category tree.
 
-```
 ### Book Search
 Instead of providing the exact book id and extract that book directly, a search function can be used to get one or more books based on some parameters.
+
 ```ruby
 # Create a new extractor object with pretty json format.
 extractor = Extractor.new(format: 'pretty_json')
@@ -391,6 +401,7 @@ With enought options you can customize your query to your needs. It is recommend
   * pretty_json
 
 Results with ids option look like that:
+
 ```json 
 {
  "book": [
