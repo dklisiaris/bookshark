@@ -418,6 +418,7 @@ Results with ids option look like that:
 }
 ```
 Normally results are multiple books like the ones in book extractors:
+
 ```json
 {
   "book": [
