@@ -58,9 +58,8 @@ Extractor.new(format: 'hash', site: 'biblionet')
 ### Extract Book Data
 
 You need book's id on biblionet website or its uri.
-Currently more advanced search functions based on title and author are not available, but they will be until the stable version 1.0.0 release.
-
 First create an extractor object:
+
 ```ruby
 # Create a new extractor object with pretty json format.
 extractor = Extractor.new(format: 'pretty_json')
