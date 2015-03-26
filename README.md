@@ -70,6 +70,15 @@ extractor = Extractor.new(format: 'pretty_json')
 Then you can extract books
 
 ```ruby
+# Extract book with isbn 960-14-1157-7 from website
+extractor.book(isbn: '960-14-1157-7')
+
+# ISBN-13 also works
+extractor.book(isbn: '978-960-14-1157-6')
+
+# ISBN without any dashes is ok too
+extractor.book(isbn: '9789601411576')
+
 # Extract book with id 103788 from website
 extractor.book(id: 103788)
 
@@ -79,6 +88,7 @@ extractor.book(uri: 'http://biblionet.gr/book/103788/')
 # Extract book with id 103788 from local storage
 extractor.book(id: 103788, local: true)
 ```
+For more options, like book's title or author, use the search method which is described below.
 
 **Book Options** 
 (Recommended option is to use just the id and let bookshark to generate uri):
@@ -157,6 +167,99 @@ The expected result of a book extraction is something like this:
 }
 ```
 Here is a [Book Sample](https://gist.github.com/dklisiaris/a6f3d6f37806186f3c79) extracted with eager option enabled.
+
+### Book Search
+Instead of providing the exact book id and extract that book directly, a search function can be used to get one or more books based on some parameters.
+
+```ruby
+# Create a new extractor object with pretty json format.
+extractor = Extractor.new(format: 'pretty_json')
+
+# Extract books with these words in title
+extractor.search(title: 'σημεια και τερατα')
+
+# Extract books with these words in title and this name in author
+extractor.search(title: 'χομπιτ', author: 'τολκιν', results_type: 'metadata')
+
+# Extract books from specific author, published after 1984
+extractor.search(author: 'arthur doyle', after_year: '2010')
+
+# Extract ids of books books with these words in title and this name in author
+extractor.search(title: 'αρχοντας', author: 'τολκιν', results_type: 'ids')
+```
+Searching and extracting several books can be very slow at times, so instead of extracting every single book you may prefer only the ids of found books. In that case pass the option `results_type: 'ids'`.
+
+**Search Options**:  
+With enought options you can customize your query to your needs. It is recommended to use at least two of the search options.
+
+* title (The title of book to search)       
+* author (The author's last name is enough for filter the search)      
+* publisher
+* category
+* title_split
+  * 0 (The exact title phrase must by matched)
+  * 1 (Default - All the words in title must be matched in whatever order)   
+  * 2 (At least one word should match)
+* book_id (Providing id means only one book should returned)      
+* isbn         
+* author_id (ID of the selected author)    
+* publisher_id 
+* category_id  
+* after_year (Published this year or later)   
+* before_year (Published this year or before)   
+* results_type
+  * metadata (Default - Every book is extracted and an array of metadata is returned)
+  * ids (Only ids are returned)
+* format : The format in which the extracted data are returned
+  * hash (default)
+  * json
+  * pretty_json
+
+Results with ids option look like that:
+
+```json 
+{
+ "book": [
+    "119000",
+    "103788",
+    "87815",
+    "87812",
+    "15839",
+    "77381",
+    "46856",
+    "46763",
+    "33301"
+  ]
+}
+```
+Normally results are multiple books like the ones in book extractors:
+
+```json
+{
+  "book": [
+    {
+      "title": "Στης Χλόης τα απόκρυφα",
+      "subtitle": "…και άλλα σημεία και τέρατα",
+      "... Rest of Metadata ...": "... condensed ..."
+    },
+    {
+      "title": "Σημεία και τέρατα της οικονομίας",
+      "subtitle": "Η κρυφή πλευρά των πάντων",
+      "... Rest of Metadata ...": "... condensed ..."     
+    },
+    {
+      "title": "Και άλλα σημεία και τέρατα από την ιστορία",
+      "subtitle": null,
+      "... Rest of Metadata ...": "... condensed ..."
+    },
+    {
+      "title": "Σημεία και τέρατα από την ιστορία",
+      "subtitle": null,
+      "... Rest of Metadata ...": "... condensed ..."      
+    }
+  ]
+}
+```
 
 ### Extract Author Data
 
@@ -352,99 +455,6 @@ The expected result of a category extraction is something like this:
 }
 ```
 Notice that the last item is the current category. The rest is the category tree.
-
-### Book Search
-Instead of providing the exact book id and extract that book directly, a search function can be used to get one or more books based on some parameters.
-
-```ruby
-# Create a new extractor object with pretty json format.
-extractor = Extractor.new(format: 'pretty_json')
-
-# Extract books with these words in title
-extractor.search(title: 'σημεια και τερατα')
-
-# Extract books with these words in title and this name in author
-extractor.search(title: 'χομπιτ', author: 'τολκιν', results_type: 'metadata')
-
-# Extract books from specific author, published after 1984
-extractor.search(author: 'arthur doyle', after_year: '2010')
-
-# Extract ids of books books with these words in title and this name in author
-extractor.search(title: 'αρχοντας', author: 'τολκιν', results_type: 'ids')
-```
-Searching and extracting several books can be very slow at times, so instead of extracting every single book you may prefer only the ids of found books. In that case pass the option `results_type: 'ids'`.
-
-**Search Options**:  
-With enought options you can customize your query to your needs. It is recommended to use at least two of the search options.
-
-* title (The title of book to search)       
-* author (The author's last name is enough for filter the search)      
-* publisher
-* category
-* title_split
-  * 0 (The exact title phrase must by matched)
-  * 1 (Default - All the words in title must be matched in whatever order)   
-  * 2 (At least one word should match)
-* book_id (Providing id means only one book should returned)      
-* isbn         
-* author_id (ID of the selected author)    
-* publisher_id 
-* category_id  
-* after_year (Published this year or later)   
-* before_year (Published this year or before)   
-* results_type
-  * metadata (Default - Every book is extracted and an array of metadata is returned)
-  * ids (Only ids are returned)
-* format : The format in which the extracted data are returned
-  * hash (default)
-  * json
-  * pretty_json
-
-Results with ids option look like that:
-
-```json 
-{
- "book": [
-    "119000",
-    "103788",
-    "87815",
-    "87812",
-    "15839",
-    "77381",
-    "46856",
-    "46763",
-    "33301"
-  ]
-}
-```
-Normally results are multiple books like the ones in book extractors:
-
-```json
-{
-  "book": [
-    {
-      "title": "Στης Χλόης τα απόκρυφα",
-      "subtitle": "…και άλλα σημεία και τέρατα",
-      "... Rest of Metadata ...": "... condensed ..."
-    },
-    {
-      "title": "Σημεία και τέρατα της οικονομίας",
-      "subtitle": "Η κρυφή πλευρά των πάντων",
-      "... Rest of Metadata ...": "... condensed ..."     
-    },
-    {
-      "title": "Και άλλα σημεία και τέρατα από την ιστορία",
-      "subtitle": null,
-      "... Rest of Metadata ...": "... condensed ..."
-    },
-    {
-      "title": "Σημεία και τέρατα από την ιστορία",
-      "subtitle": null,
-      "... Rest of Metadata ...": "... condensed ..."      
-    }
-  ]
-}
-```
 
 ### Where do IDs point?
 The id of each data type points to the corresponding type webpage.
