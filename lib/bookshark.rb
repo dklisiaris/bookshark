@@ -66,10 +66,15 @@ module Bookshark
 
     def book(options = {})
       book_extractor = Biblionet::Extractors::BookExtractor.new
+      
+      if book_extractor.present?(options[:isbn])
+        search_engine = Biblionet::Extractors::Search.new
+        options[:id]  = search_engine.search_by_isbn(options[:isbn])
+      end  
 
       uri = process_options(options, __method__)
       options[:format]  ||= @format
-      options[:eager]   ||= false
+      options[:eager]   ||= false            
       
       if options[:eager]
         book = eager_extract_book(uri)

@@ -40,6 +40,11 @@ module Biblionet
         return books    
       end
 
+      def search_by_isbn(isbn)
+        results = perform_search(isbn: isbn, results_type: 'ids')
+        book_id = results.empty? ? nil : results.first.to_i
+      end
+
       def build_search_url(options = {})
         title         = present?(options[:title])     ? options[:title].gsub(' ','+')     : ''
         author        = present?(options[:author])    ? options[:author].gsub(' ','+')    : ''

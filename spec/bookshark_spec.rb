@@ -120,12 +120,25 @@ describe Bookshark::Extractor do
         it 'reads html from the web and eager extracts all book and reference data' do
           expect(subject.book(id: 184923, eager: true)).to eq eager_book_184923
         end
+
+        it 'reads html from the web based on given isbn and extracts book data' do
+          expect(subject.book(isbn: '960-14-1157-7')).to eq book_103788
+        end 
+
+        it 'reads html from the web based on given isbn-13 and extracts book data' do
+          expect(subject.book(isbn: '978-960-14-1157-6')).to eq book_103788
+        end         
       end
       context 'when the book doesnt exist' do
         it 'returns an empty array' do
           expect(subject.book(id: 0)).to eq empty_book
         end  
       end  
+      context 'when the books isbn is nonsense' do
+        it 'returns an empty array' do
+          expect(subject.book(isbn: 'wrong-isbn')).to eq empty_book
+        end  
+      end        
       context 'when no options are set' do
         it 'returns an empty array' do
           expect(subject.book).to eq empty_book
