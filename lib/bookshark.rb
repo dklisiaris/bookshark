@@ -17,9 +17,10 @@ module Bookshark
   }
 
   def self.root
-    File.dirname __dir__
+    # File.dirname __dir__ # Works only on ruby > 2.0.0
+    File.expand_path(File.join(File.dirname(__FILE__), '../'))
   end  
-
+ 
   def self.path_to_storage
     File.join root, 'lib/bookshark/storage'
   end

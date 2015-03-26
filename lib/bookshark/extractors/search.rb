@@ -1,3 +1,6 @@
+#!/bin/env ruby
+# encoding: utf-8
+
 require_relative 'book_extractor'
 
 module Biblionet
