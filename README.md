@@ -6,6 +6,7 @@ extracts books, authors, publishers and ddc metatdata.
 The representation of bibliographic metadata in JSON is inspired by [BibJSON](http://okfnlabs.org/bibjson/) but some tags may be different.
 
 [![Build Status](https://travis-ci.org/dklisiaris/bookshark.svg?branch=master)](https://travis-ci.org/dklisiaris/bookshark)
+[![Dependency Status](https://gemnasium.com/dklisiaris/bookshark.svg)](https://gemnasium.com/dklisiaris/bookshark)
 
 ## Installation
 
