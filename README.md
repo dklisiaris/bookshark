@@ -292,7 +292,7 @@ The expected result of an author extraction is something like this:
       "name": "Tolkien, John Ronald Reuel",
       "firstname": "John Ronald Reuel",
       "lastname": "Tolkien",
-      "lifetime": "1892-1973",
+      "extra_info": "1892-1973",
       "image": "http://www.biblionet.gr/images/persons/10207.jpg",
       "bio": "Ο John Ronald Reuel Tolkien, άγγλος φιλόλογος και συγγραφέας, γεννήθηκε το 1892 στην πόλη Μπλουμφοντέιν...",
       "award": [

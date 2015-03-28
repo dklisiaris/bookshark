@@ -38,7 +38,7 @@ module Biblionet
         end      
         author_hash[:firstname] = identity[:firstname]
         author_hash[:lastname] = identity[:lastname]
-        author_hash[:lifetime] = identity[:lifetime]
+        author_hash[:extra_info] = identity[:extra_info]
         author_hash[:image] = page.image
         author_hash[:bio] = page.bio
         author_hash[:award] = page.awards
@@ -65,13 +65,13 @@ module Biblionet
         
         if parts.length == 2
           if parts[1] =~ years_re
-            identity[:lifetime] = parts[1]
+            identity[:extra_info] = parts[1]
           else
             identity[:firstname] = parts[1]
           end
         elsif parts.length == 3
           identity[:firstname] = parts[1]
-          identity[:lifetime] = parts[2]
+          identity[:extra_info] = parts[2]
         end
 
         return identity
