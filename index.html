@@ -1,0 +1,636 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <meta name="viewport" content="width=640">
+
+    <link rel="stylesheet" href="stylesheets/core.css" media="screen">
+    <link rel="stylesheet" href="stylesheets/mobile.css" media="handheld, only screen and (max-device-width:640px)">
+    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
+
+    <script type="text/javascript" src="javascripts/modernizr.js"></script>
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+    <script type="text/javascript" src="javascripts/headsmart.min.js"></script>
+    <script type="text/javascript">
+      $(document).ready(function () {
+        $('#main_content').headsmart()
+      })
+    </script>
+    <title>Bookshark by dklisiaris</title>
+  </head>
+
+  <body>
+    <a id="forkme_banner" href="https://github.com/dklisiaris/bookshark">View on GitHub</a>
+    <div class="shell">
+
+      <header>
+        <span class="ribbon-outer">
+          <span class="ribbon-inner">
+            <h1>Bookshark</h1>
+            <h2>A ruby library for book metadata extraction from biblionet.gr.</h2>
+          </span>
+          <span class="left-tail"></span>
+          <span class="right-tail"></span>
+        </span>
+      </header>
+
+      <section id="downloads">
+        <span class="inner">
+          <a href="https://github.com/dklisiaris/bookshark/zipball/master" class="zip"><em>download</em> .ZIP</a><a href="https://github.com/dklisiaris/bookshark/tarball/master" class="tgz"><em>download</em> .TGZ</a>
+        </span>
+      </section>
+
+
+      <span class="banner-fix"></span>
+
+
+      <section id="main_content">
+        <h1>
+<a id="bookshark" class="anchor" href="#bookshark" aria-hidden="true"><span class="octicon octicon-link"></span></a>Bookshark</h1>
+
+<p><img src="https://dl.dropboxusercontent.com/u/4888041/bookshark/logo.png" alt="Bookshark Logo"></p>
+
+<p>A ruby library for book metadata extraction from biblionet.gr which
+extracts books, authors, publishers and ddc metatdata.
+The representation of bibliographic metadata in JSON is inspired by <a href="http://okfnlabs.org/bibjson/">BibJSON</a> but some tags may be different.</p>
+
+<p><a href="https://travis-ci.org/dklisiaris/bookshark"><img src="https://travis-ci.org/dklisiaris/bookshark.svg?branch=master" alt="Build Status"></a>
+<a href="https://gemnasium.com/dklisiaris/bookshark"><img src="https://gemnasium.com/dklisiaris/bookshark.svg" alt="Dependency Status"></a></p>
+
+<h2>
+<a id="installation" class="anchor" href="#installation" aria-hidden="true"><span class="octicon octicon-link"></span></a>Installation</h2>
+
+<p>Add this line to your application's Gemfile:</p>
+
+<div class="highlight highlight-ruby"><pre><span class="pl-k">gem</span> <span class="pl-s"><span class="pl-pds">'</span>bookshark<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">"</span>~&gt; 1.0.0.alpha<span class="pl-pds">"</span></span></pre></div>
+
+<p>And then execute:</p>
+
+<pre><code>$ bundle install
+</code></pre>
+
+<p>Or install it yourself as:</p>
+
+<pre><code>$ gem install bookshark --pre
+</code></pre>
+
+<p>Require and include bookshark in your class/module.</p>
+
+<div class="highlight highlight-ruby"><pre><span class="pl-k">require</span> <span class="pl-s"><span class="pl-pds">'</span>bookshark<span class="pl-pds">'</span></span>
+<span class="pl-k">class</span> <span class="pl-en">Foo</span>
+  <span class="pl-k">include</span> <span class="pl-c1">Bookshark</span>
+<span class="pl-k">end</span></pre></div>
+
+<p>Alternatively you can use this syntax</p>
+
+<div class="highlight highlight-ruby"><pre><span class="pl-c1">Bookshark</span>::<span class="pl-c1">Extractor</span>.<span class="pl-k">new</span>
+
+<span class="pl-c"># Instead of this</span>
+<span class="pl-k">include</span> <span class="pl-c1">Bookshark</span>
+<span class="pl-c1">Extractor</span>.<span class="pl-k">new</span></pre></div>
+
+<h2>
+<a id="extractor" class="anchor" href="#extractor" aria-hidden="true"><span class="octicon octicon-link"></span></a>Extractor</h2>
+
+<p>An extractor object must be created in order to perform any metadata extractions.</p>
+
+<p>Create an extractor object</p>
+
+<div class="highlight highlight-ruby"><pre><span class="pl-c1">Extractor</span>.<span class="pl-k">new</span>
+<span class="pl-c1">Extractor</span>.<span class="pl-k">new</span>(<span class="pl-c1">format:</span> <span class="pl-s"><span class="pl-pds">'</span>json<span class="pl-pds">'</span></span>)
+<span class="pl-c1">Extractor</span>.<span class="pl-k">new</span>(<span class="pl-c1">format:</span> <span class="pl-s"><span class="pl-pds">'</span>hash<span class="pl-pds">'</span></span>, <span class="pl-c1">site:</span> <span class="pl-s"><span class="pl-pds">'</span>biblionet<span class="pl-pds">'</span></span>)</pre></div>
+
+<p><strong>Extractor Options</strong>:</p>
+
+<ul>
+<li>format : The format in which the extracted data are returned
+
+<ul>
+<li>hash (default)</li>
+<li>json</li>
+<li>pretty_json</li>
+</ul>
+</li>
+<li>site : The site from where the metadata will be extracted
+
+<ul>
+<li>biblionet (default and currently the only available, so it can be skipped)</li>
+</ul>
+</li>
+</ul>
+
+<h3>
+<a id="extract-book-data" class="anchor" href="#extract-book-data" aria-hidden="true"><span class="octicon octicon-link"></span></a>Extract Book Data</h3>
+
+<p>You need book's id on biblionet website or its uri.
+First create an extractor object:</p>
+
+<div class="highlight highlight-ruby"><pre><span class="pl-c"># Create a new extractor object with pretty json format.</span>
+extractor <span class="pl-k">=</span> <span class="pl-c1">Extractor</span>.<span class="pl-k">new</span>(<span class="pl-c1">format:</span> <span class="pl-s"><span class="pl-pds">'</span>pretty_json<span class="pl-pds">'</span></span>)</pre></div>
+
+<p>Then you can extract books</p>
+
+<div class="highlight highlight-ruby"><pre><span class="pl-c"># Extract book with isbn 960-14-1157-7 from website</span>
+extractor.book(<span class="pl-c1">isbn:</span> <span class="pl-s"><span class="pl-pds">'</span>960-14-1157-7<span class="pl-pds">'</span></span>)
+
+<span class="pl-c"># ISBN-13 also works</span>
+extractor.book(<span class="pl-c1">isbn:</span> <span class="pl-s"><span class="pl-pds">'</span>978-960-14-1157-6<span class="pl-pds">'</span></span>)
+
+<span class="pl-c"># ISBN without any dashes is ok too</span>
+extractor.book(<span class="pl-c1">isbn:</span> <span class="pl-s"><span class="pl-pds">'</span>9789601411576<span class="pl-pds">'</span></span>)
+
+<span class="pl-c"># Extract book with id 103788 from website</span>
+extractor.book(<span class="pl-c1">id:</span> <span class="pl-c1">103788</span>)
+
+<span class="pl-c"># Extract book from the provided webpage </span>
+extractor.book(<span class="pl-c1">uri:</span> <span class="pl-s"><span class="pl-pds">'</span>http://biblionet.gr/book/103788/<span class="pl-pds">'</span></span>)
+
+<span class="pl-c"># Extract book with id 103788 from local storage</span>
+extractor.book(<span class="pl-c1">id:</span> <span class="pl-c1">103788</span>, <span class="pl-c1">local:</span> <span class="pl-c1">true</span>)</pre></div>
+
+<p>For more options, like book's title or author, use the search method which is described below.</p>
+
+<p><strong>Book Options</strong> 
+(Recommended option is to use just the id and let bookshark to generate uri):</p>
+
+<ul>
+<li>id : The id of book on the corresponding site (Integer)</li>
+<li>uri : The url of book web page or the path to local file.</li>
+<li>local : Boolean value. Has page been saved locally? (default is false) </li>
+<li>format : The format in which the extracted data are returned
+
+<ul>
+<li>hash (default)</li>
+<li>json</li>
+<li>pretty_json</li>
+</ul>
+</li>
+<li>eager : Perform eager extraction? (Boolean - default is false)</li>
+</ul>
+
+<h4>
+<a id="eager-extraction" class="anchor" href="#eager-extraction" aria-hidden="true"><span class="octicon octicon-link"></span></a>Eager Extraction</h4>
+
+<p>Each book has some attributes such as authors, contributors, categories etc which are actually references to other objects.<br>
+By default when extracting a book, you get only names of these objects and references to their pages.<br>
+With eager option set to true, each of these objects' data is extracted and the produced output contains complete information about every object.<br>
+Eager extraction doesn't work with local option enabled.</p>
+
+<div class="highlight highlight-ruby"><pre><span class="pl-c"># Extract book with id 103788 with eager extraction option enabled</span>
+extractor.book(<span class="pl-c1">id:</span> <span class="pl-c1">103788</span>, <span class="pl-c1">eager:</span> <span class="pl-c1">true</span>)</pre></div>
+
+<p>The expected result of a book extraction is something like this:</p>
+
+<div class="highlight highlight-json"><pre>{
+  <span class="pl-s"><span class="pl-pds">"</span>book<span class="pl-pds">"</span></span>: [
+    {
+      <span class="pl-s"><span class="pl-pds">"</span>title<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>Σημεία και τέρατα της οικονομίας<span class="pl-pds">"</span></span>,
+      <span class="pl-s"><span class="pl-pds">"</span>subtitle<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>Η κρυφή πλευρά των πάντων<span class="pl-pds">"</span></span>,
+      <span class="pl-s"><span class="pl-pds">"</span>image<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>http://www.biblionet.gr/images/covers/b103788.jpg<span class="pl-pds">"</span></span>,
+      <span class="pl-s"><span class="pl-pds">"</span>author<span class="pl-pds">"</span></span>: [
+        {
+          <span class="pl-s"><span class="pl-pds">"</span>name<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>Steven D. Levitt<span class="pl-pds">"</span></span>,
+          <span class="pl-s"><span class="pl-pds">"</span>b_id<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>59782<span class="pl-pds">"</span></span>
+        },
+        {
+          <span class="pl-s"><span class="pl-pds">"</span>name<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>Stephen J. Dubner<span class="pl-pds">"</span></span>,
+          <span class="pl-s"><span class="pl-pds">"</span>b_id<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>59783<span class="pl-pds">"</span></span>
+        }
+      ],
+      <span class="pl-s"><span class="pl-pds">"</span>contributors<span class="pl-pds">"</span></span>: {
+        <span class="pl-s"><span class="pl-pds">"</span>μετάφραση<span class="pl-pds">"</span></span>: [
+          {
+            <span class="pl-s"><span class="pl-pds">"</span>name<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>Άγγελος Φιλιππάτος<span class="pl-pds">"</span></span>,
+            <span class="pl-s"><span class="pl-pds">"</span>b_id<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>851<span class="pl-pds">"</span></span>
+          }
+        ]
+      },
+      <span class="pl-s"><span class="pl-pds">"</span>publisher<span class="pl-pds">"</span></span>: {
+        <span class="pl-s"><span class="pl-pds">"</span>name<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>Εκδοτικός Οίκος Α. Α. Λιβάνη<span class="pl-pds">"</span></span>,
+        <span class="pl-s"><span class="pl-pds">"</span>b_id<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>271<span class="pl-pds">"</span></span>
+      },
+      <span class="pl-s"><span class="pl-pds">"</span>publication_year<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>2006<span class="pl-pds">"</span></span>,
+      <span class="pl-s"><span class="pl-pds">"</span>pages<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>326<span class="pl-pds">"</span></span>,
+      <span class="pl-s"><span class="pl-pds">"</span>isbn<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>960-14-1157-7<span class="pl-pds">"</span></span>,
+      <span class="pl-s"><span class="pl-pds">"</span>isbn_13<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>978-960-14-1157-6<span class="pl-pds">"</span></span>,
+      <span class="pl-s"><span class="pl-pds">"</span>status<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>Κυκλοφορεί<span class="pl-pds">"</span></span>,
+      <span class="pl-s"><span class="pl-pds">"</span>price<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>16,31<span class="pl-pds">"</span></span>,
+      <span class="pl-s"><span class="pl-pds">"</span>award<span class="pl-pds">"</span></span>: [
+      ],
+      <span class="pl-s"><span class="pl-pds">"</span>description<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>Τι είναι πιο επικίνδυνο, ένα όπλο ή μια πισίνα; Τι κοινό έχουν οι δάσκαλοι με τους παλαιστές του σούμο;...<span class="pl-pds">"</span></span>,
+      <span class="pl-s"><span class="pl-pds">"</span>category<span class="pl-pds">"</span></span>: [
+        {
+          <span class="pl-s"><span class="pl-pds">"</span>ddc<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>330<span class="pl-pds">"</span></span>,
+          <span class="pl-s"><span class="pl-pds">"</span>text<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>Οικονομία<span class="pl-pds">"</span></span>,
+          <span class="pl-s"><span class="pl-pds">"</span>b_id<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>142<span class="pl-pds">"</span></span>
+        }
+      ],
+      <span class="pl-s"><span class="pl-pds">"</span>b_id<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>103788<span class="pl-pds">"</span></span>
+    }
+  ]
+}</pre></div>
+
+<p>Here is a <a href="https://gist.github.com/dklisiaris/a6f3d6f37806186f3c79">Book Sample</a> extracted with eager option enabled.</p>
+
+<h3>
+<a id="book-search" class="anchor" href="#book-search" aria-hidden="true"><span class="octicon octicon-link"></span></a>Book Search</h3>
+
+<p>Instead of providing the exact book id and extract that book directly, a search function can be used to get one or more books based on some parameters.</p>
+
+<div class="highlight highlight-ruby"><pre><span class="pl-c"># Create a new extractor object with pretty json format.</span>
+extractor <span class="pl-k">=</span> <span class="pl-c1">Extractor</span>.<span class="pl-k">new</span>(<span class="pl-c1">format:</span> <span class="pl-s"><span class="pl-pds">'</span>pretty_json<span class="pl-pds">'</span></span>)
+
+<span class="pl-c"># Extract books with these words in title</span>
+extractor.search(<span class="pl-c1">title:</span> <span class="pl-s"><span class="pl-pds">'</span>σημεια και τερατα<span class="pl-pds">'</span></span>)
+
+<span class="pl-c"># Extract books with these words in title and this name in author</span>
+extractor.search(<span class="pl-c1">title:</span> <span class="pl-s"><span class="pl-pds">'</span>χομπιτ<span class="pl-pds">'</span></span>, <span class="pl-c1">author:</span> <span class="pl-s"><span class="pl-pds">'</span>τολκιν<span class="pl-pds">'</span></span>, <span class="pl-c1">results_type:</span> <span class="pl-s"><span class="pl-pds">'</span>metadata<span class="pl-pds">'</span></span>)
+
+<span class="pl-c"># Extract books from specific author, published after 1984</span>
+extractor.search(<span class="pl-c1">author:</span> <span class="pl-s"><span class="pl-pds">'</span>arthur doyle<span class="pl-pds">'</span></span>, <span class="pl-c1">after_year:</span> <span class="pl-s"><span class="pl-pds">'</span>2010<span class="pl-pds">'</span></span>)
+
+<span class="pl-c"># Extract ids of books books with these words in title and this name in author</span>
+extractor.search(<span class="pl-c1">title:</span> <span class="pl-s"><span class="pl-pds">'</span>αρχοντας<span class="pl-pds">'</span></span>, <span class="pl-c1">author:</span> <span class="pl-s"><span class="pl-pds">'</span>τολκιν<span class="pl-pds">'</span></span>, <span class="pl-c1">results_type:</span> <span class="pl-s"><span class="pl-pds">'</span>ids<span class="pl-pds">'</span></span>)</pre></div>
+
+<p>Searching and extracting several books can be very slow at times, so instead of extracting every single book you may prefer only the ids of found books. In that case pass the option <code>results_type: 'ids'</code>.</p>
+
+<p><strong>Search Options</strong>:<br>
+With enought options you can customize your query to your needs. It is recommended to use at least two of the search options.</p>
+
+<ul>
+<li>title (The title of book to search)<br>
+</li>
+<li>author (The author's last name is enough for filter the search)<br>
+</li>
+<li>publisher</li>
+<li>category</li>
+<li>title_split
+
+<ul>
+<li>0 (The exact title phrase must by matched)</li>
+<li>1 (Default - All the words in title must be matched in whatever order)<br>
+</li>
+<li>2 (At least one word should match)</li>
+</ul>
+</li>
+<li>book_id (Providing id means only one book should returned)<br>
+</li>
+<li>isbn<br>
+</li>
+<li>author_id (ID of the selected author)<br>
+</li>
+<li>publisher_id </li>
+<li>category_id<br>
+</li>
+<li>after_year (Published this year or later)<br>
+</li>
+<li>before_year (Published this year or before)<br>
+</li>
+<li>results_type
+
+<ul>
+<li>metadata (Default - Every book is extracted and an array of metadata is returned)</li>
+<li>ids (Only ids are returned)</li>
+</ul>
+</li>
+<li>format : The format in which the extracted data are returned
+
+<ul>
+<li>hash (default)</li>
+<li>json</li>
+<li>pretty_json</li>
+</ul>
+</li>
+</ul>
+
+<p>Results with ids option look like that:</p>
+
+<div class="highlight highlight-json"><pre>{
+ <span class="pl-s"><span class="pl-pds">"</span>book<span class="pl-pds">"</span></span>: [
+    <span class="pl-s"><span class="pl-pds">"</span>119000<span class="pl-pds">"</span></span>,
+    <span class="pl-s"><span class="pl-pds">"</span>103788<span class="pl-pds">"</span></span>,
+    <span class="pl-s"><span class="pl-pds">"</span>87815<span class="pl-pds">"</span></span>,
+    <span class="pl-s"><span class="pl-pds">"</span>87812<span class="pl-pds">"</span></span>,
+    <span class="pl-s"><span class="pl-pds">"</span>15839<span class="pl-pds">"</span></span>,
+    <span class="pl-s"><span class="pl-pds">"</span>77381<span class="pl-pds">"</span></span>,
+    <span class="pl-s"><span class="pl-pds">"</span>46856<span class="pl-pds">"</span></span>,
+    <span class="pl-s"><span class="pl-pds">"</span>46763<span class="pl-pds">"</span></span>,
+    <span class="pl-s"><span class="pl-pds">"</span>33301<span class="pl-pds">"</span></span>
+  ]
+}</pre></div>
+
+<p>Normally results are multiple books like the ones in book extractors:</p>
+
+<div class="highlight highlight-json"><pre>{
+  <span class="pl-s"><span class="pl-pds">"</span>book<span class="pl-pds">"</span></span>: [
+    {
+      <span class="pl-s"><span class="pl-pds">"</span>title<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>Στης Χλόης τα απόκρυφα<span class="pl-pds">"</span></span>,
+      <span class="pl-s"><span class="pl-pds">"</span>subtitle<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>…και άλλα σημεία και τέρατα<span class="pl-pds">"</span></span>,
+      <span class="pl-s"><span class="pl-pds">"</span>... Rest of Metadata ...<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>... condensed ...<span class="pl-pds">"</span></span>
+    },
+    {
+      <span class="pl-s"><span class="pl-pds">"</span>title<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>Σημεία και τέρατα της οικονομίας<span class="pl-pds">"</span></span>,
+      <span class="pl-s"><span class="pl-pds">"</span>subtitle<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>Η κρυφή πλευρά των πάντων<span class="pl-pds">"</span></span>,
+      <span class="pl-s"><span class="pl-pds">"</span>... Rest of Metadata ...<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>... condensed ...<span class="pl-pds">"</span></span>     
+    },
+    {
+      <span class="pl-s"><span class="pl-pds">"</span>title<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>Και άλλα σημεία και τέρατα από την ιστορία<span class="pl-pds">"</span></span>,
+      <span class="pl-s"><span class="pl-pds">"</span>subtitle<span class="pl-pds">"</span></span>: <span class="pl-c1">null</span>,
+      <span class="pl-s"><span class="pl-pds">"</span>... Rest of Metadata ...<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>... condensed ...<span class="pl-pds">"</span></span>
+    },
+    {
+      <span class="pl-s"><span class="pl-pds">"</span>title<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>Σημεία και τέρατα από την ιστορία<span class="pl-pds">"</span></span>,
+      <span class="pl-s"><span class="pl-pds">"</span>subtitle<span class="pl-pds">"</span></span>: <span class="pl-c1">null</span>,
+      <span class="pl-s"><span class="pl-pds">"</span>... Rest of Metadata ...<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>... condensed ...<span class="pl-pds">"</span></span>      
+    }
+  ]
+}</pre></div>
+
+<h3>
+<a id="extract-author-data" class="anchor" href="#extract-author-data" aria-hidden="true"><span class="octicon octicon-link"></span></a>Extract Author Data</h3>
+
+<p>You need author's id on biblionet website or his uri</p>
+
+<div class="highlight highlight-ruby"><pre><span class="pl-c1">Extractor</span>.<span class="pl-k">new</span>.author(<span class="pl-c1">id:</span> <span class="pl-c1">10207</span>)
+<span class="pl-c1">Extractor</span>.<span class="pl-k">new</span>(<span class="pl-c1">format:</span> <span class="pl-s"><span class="pl-pds">'</span>json<span class="pl-pds">'</span></span>).author(<span class="pl-c1">uri:</span> <span class="pl-s"><span class="pl-pds">'</span>http://www.biblionet.gr/author/10207/<span class="pl-pds">'</span></span>)</pre></div>
+
+<p>Extraction from local saved html pages is also possible, but not recommended</p>
+
+<div class="highlight highlight-ruby"><pre>extractor <span class="pl-k">=</span> <span class="pl-c1">Extractor</span>.<span class="pl-k">new</span>(<span class="pl-c1">format:</span> <span class="pl-s"><span class="pl-pds">'</span>json<span class="pl-pds">'</span></span>)
+extractor.author(<span class="pl-c1">uri:</span> <span class="pl-s"><span class="pl-pds">'</span>storage/html_author_pages/2/author_2423.html<span class="pl-pds">'</span></span>, <span class="pl-c1">local:</span> <span class="pl-c1">true</span>)</pre></div>
+
+<p><strong>Author Options</strong>: (Recommended option is to use just the id and let bookshark to generate uri):</p>
+
+<ul>
+<li>id : The id of author on the corresponding site (Integer)</li>
+<li>uri : The url of author web page or the path to local file.</li>
+<li>local : Boolean value. Has page been saved locally? (default is false) </li>
+</ul>
+
+<p>The expected result of an author extraction is something like this:</p>
+
+<div class="highlight highlight-json"><pre>{
+  <span class="pl-s"><span class="pl-pds">"</span>author<span class="pl-pds">"</span></span>: [
+    {
+      <span class="pl-s"><span class="pl-pds">"</span>name<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>Tolkien, John Ronald Reuel<span class="pl-pds">"</span></span>,
+      <span class="pl-s"><span class="pl-pds">"</span>firstname<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>John Ronald Reuel<span class="pl-pds">"</span></span>,
+      <span class="pl-s"><span class="pl-pds">"</span>lastname<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>Tolkien<span class="pl-pds">"</span></span>,
+      <span class="pl-s"><span class="pl-pds">"</span>extra_info<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>1892-1973<span class="pl-pds">"</span></span>,
+      <span class="pl-s"><span class="pl-pds">"</span>image<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>http://www.biblionet.gr/images/persons/10207.jpg<span class="pl-pds">"</span></span>,
+      <span class="pl-s"><span class="pl-pds">"</span>bio<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>Ο John Ronald Reuel Tolkien, άγγλος φιλόλογος και συγγραφέας, γεννήθηκε το 1892 στην πόλη Μπλουμφοντέιν...<span class="pl-pds">"</span></span>,
+      <span class="pl-s"><span class="pl-pds">"</span>award<span class="pl-pds">"</span></span>: [
+        {
+          <span class="pl-s"><span class="pl-pds">"</span>name<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>The Benson Medal [The Royal Society of Literature]<span class="pl-pds">"</span></span>,
+          <span class="pl-s"><span class="pl-pds">"</span>year<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>1966<span class="pl-pds">"</span></span>
+        }
+      ],
+      <span class="pl-s"><span class="pl-pds">"</span>b_id<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>10207<span class="pl-pds">"</span></span>
+    }
+  ]
+}</pre></div>
+
+<p>The convention here is that there is never just a single author, but instead the author hash is stored inside an array. 
+So, it is easy to include metadata for multiple authors or even for multiple types of entities such as publishers or books on the same json file.</p>
+
+<h3>
+<a id="extract-publisher-data" class="anchor" href="#extract-publisher-data" aria-hidden="true"><span class="octicon octicon-link"></span></a>Extract Publisher Data</h3>
+
+<p>Methods are pretty same as author:</p>
+
+<div class="highlight highlight-ruby"><pre><span class="pl-c"># Create a new extractor object with pretty json format.</span>
+extractor <span class="pl-k">=</span> <span class="pl-c1">Extractor</span>.<span class="pl-k">new</span>(<span class="pl-c1">format:</span> <span class="pl-s"><span class="pl-pds">'</span>pretty_json<span class="pl-pds">'</span></span>)
+
+<span class="pl-c"># Extract publisher with id 20 from website</span>
+extractor.publisher(<span class="pl-c1">id:</span> <span class="pl-c1">20</span>)
+
+<span class="pl-c"># Extract publisher from the provided webpage </span>
+extractor.publisher(<span class="pl-c1">uri:</span> <span class="pl-s"><span class="pl-pds">'</span>http://biblionet.gr/com/20/<span class="pl-pds">'</span></span>)
+
+<span class="pl-c"># Extract publisher with id 20 from local storage</span>
+extractor.publisher(<span class="pl-c1">id:</span> <span class="pl-c1">20</span>, <span class="pl-c1">local:</span> <span class="pl-c1">true</span>)</pre></div>
+
+<p><strong>Publisher Options</strong>: (Recommended option is to use just the id and let bookshark to generate uri):</p>
+
+<ul>
+<li>id : The id of publisher on the corresponding site (Integer)</li>
+<li>uri : The url of publisher web page or the path to local file.</li>
+<li>local : Boolean value. Has page been saved locally? (default is false) </li>
+<li>format : The format in which the extracted data are returned
+
+<ul>
+<li>hash (default)</li>
+<li>json</li>
+<li>pretty_json</li>
+</ul>
+</li>
+</ul>
+
+<p>The expected result of an author extraction is something like this:</p>
+
+<div class="highlight highlight-json"><pre>{
+  <span class="pl-s"><span class="pl-pds">"</span>publisher<span class="pl-pds">"</span></span>: [
+    {
+      <span class="pl-s"><span class="pl-pds">"</span>name<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>Εκδόσεις Πατάκη<span class="pl-pds">"</span></span>,
+      <span class="pl-s"><span class="pl-pds">"</span>owner<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>Στέφανος Πατάκης<span class="pl-pds">"</span></span>,
+      <span class="pl-s"><span class="pl-pds">"</span>bookstores<span class="pl-pds">"</span></span>: {
+        <span class="pl-s"><span class="pl-pds">"</span>Κεντρική διάθεση<span class="pl-pds">"</span></span>: {
+          <span class="pl-s"><span class="pl-pds">"</span>address<span class="pl-pds">"</span></span>: [
+            <span class="pl-s"><span class="pl-pds">"</span>Εμμ. Μπενάκη 16<span class="pl-pds">"</span></span>,
+            <span class="pl-s"><span class="pl-pds">"</span>106 78 Αθήνα<span class="pl-pds">"</span></span>
+          ],
+          <span class="pl-s"><span class="pl-pds">"</span>telephone<span class="pl-pds">"</span></span>: [
+            <span class="pl-s"><span class="pl-pds">"</span>210 3831078<span class="pl-pds">"</span></span>
+          ]
+        },
+        <span class="pl-s"><span class="pl-pds">"</span>Γενικό βιβλιοπωλείο Πατάκη<span class="pl-pds">"</span></span>: {
+          <span class="pl-s"><span class="pl-pds">"</span>address<span class="pl-pds">"</span></span>: [
+            <span class="pl-s"><span class="pl-pds">"</span>Ακαδημίας 65<span class="pl-pds">"</span></span>,
+            <span class="pl-s"><span class="pl-pds">"</span>106 78 Αθήνα<span class="pl-pds">"</span></span>
+          ],
+          <span class="pl-s"><span class="pl-pds">"</span>telephone<span class="pl-pds">"</span></span>: [
+            <span class="pl-s"><span class="pl-pds">"</span>210 3811850<span class="pl-pds">"</span></span>,
+            <span class="pl-s"><span class="pl-pds">"</span>210 3811740<span class="pl-pds">"</span></span>
+          ]
+        },
+        <span class="pl-s"><span class="pl-pds">"</span>Έδρα<span class="pl-pds">"</span></span>: {
+          <span class="pl-s"><span class="pl-pds">"</span>address<span class="pl-pds">"</span></span>: [
+            <span class="pl-s"><span class="pl-pds">"</span>Παναγή Τσαλδάρη 38 (πρ. Πειραιώς)<span class="pl-pds">"</span></span>,
+            <span class="pl-s"><span class="pl-pds">"</span>104 37 Αθήνα<span class="pl-pds">"</span></span>
+          ],
+          <span class="pl-s"><span class="pl-pds">"</span>telephone<span class="pl-pds">"</span></span>: [
+            <span class="pl-s"><span class="pl-pds">"</span>210 3650000<span class="pl-pds">"</span></span>,
+            <span class="pl-s"><span class="pl-pds">"</span>210 5205600<span class="pl-pds">"</span></span>
+          ],
+          <span class="pl-s"><span class="pl-pds">"</span>fax<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>210 3650069<span class="pl-pds">"</span></span>,
+          <span class="pl-s"><span class="pl-pds">"</span>email<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>info@patakis.gr<span class="pl-pds">"</span></span>,
+          <span class="pl-s"><span class="pl-pds">"</span>website<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>www.patakis.gr<span class="pl-pds">"</span></span>         
+        }
+      },
+      <span class="pl-s"><span class="pl-pds">"</span>b_id<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>20<span class="pl-pds">"</span></span>
+    }
+  ]
+}</pre></div>
+
+<h3>
+<a id="extract-categories" class="anchor" href="#extract-categories" aria-hidden="true"><span class="octicon octicon-link"></span></a>Extract Categories</h3>
+
+<p>Biblionet's categories are based on <a href="http://en.wikipedia.org/wiki/Dewey_Decimal_Classification">Dewey Decimal Classification</a>. It is possible to extract these categories also as seen below.</p>
+
+<div class="highlight highlight-ruby"><pre><span class="pl-c"># Create a new extractor object with pretty json format.</span>
+extractor <span class="pl-k">=</span> <span class="pl-c1">Extractor</span>.<span class="pl-k">new</span>(<span class="pl-c1">format:</span> <span class="pl-s"><span class="pl-pds">'</span>pretty_json<span class="pl-pds">'</span></span>)
+
+<span class="pl-c"># Extract category with id 1041 from website</span>
+extractor.category(<span class="pl-c1">id:</span> <span class="pl-c1">1041</span>)
+
+<span class="pl-c"># Extract category from the provided webpage </span>
+extractor.category(<span class="pl-c1">uri:</span> <span class="pl-s"><span class="pl-pds">'</span>http://biblionet.gr/index/1041/<span class="pl-pds">'</span></span>)
+
+<span class="pl-c"># Extract category with id 1041 from local storage</span>
+extractor.category(<span class="pl-c1">id:</span> <span class="pl-c1">1041</span>, <span class="pl-c1">local:</span> <span class="pl-c1">true</span>)</pre></div>
+
+<p><strong>Categories Options</strong>: (Pretty much the same as previous cases)</p>
+
+<ul>
+<li>id : The id of category on the corresponding site (Integer)</li>
+<li>uri : The url of category web page or the path to local file.</li>
+<li>local : Boolean value. Has page been saved locally? (default is false) </li>
+<li>format : The format in which the extracted data are returned
+
+<ul>
+<li>hash (default)</li>
+<li>json</li>
+<li>pretty_json</li>
+</ul>
+</li>
+</ul>
+
+<p>Notice that when you are extracting a category you also extract parent categories and subcategories, thus you never extract just one category.</p>
+
+<p>The expected result of a category extraction is something like this:
+(Here the extracted category is the 1041, but parent and sub categories were also extracted.</p>
+
+<div class="highlight highlight-json"><pre>{
+  <span class="pl-s"><span class="pl-pds">"</span>category<span class="pl-pds">"</span></span>: [
+    {
+      <span class="pl-s"><span class="pl-pds">"</span>192<span class="pl-pds">"</span></span>: {
+        <span class="pl-s"><span class="pl-pds">"</span>ddc<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>500<span class="pl-pds">"</span></span>,
+        <span class="pl-s"><span class="pl-pds">"</span>name<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>Φυσικές και θετικές επιστήμες<span class="pl-pds">"</span></span>,
+        <span class="pl-s"><span class="pl-pds">"</span>parent<span class="pl-pds">"</span></span>: <span class="pl-c1">null</span>
+      },
+      <span class="pl-s"><span class="pl-pds">"</span>1040<span class="pl-pds">"</span></span>: {
+        <span class="pl-s"><span class="pl-pds">"</span>ddc<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>520<span class="pl-pds">"</span></span>,
+        <span class="pl-s"><span class="pl-pds">"</span>name<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>Αστρονομία<span class="pl-pds">"</span></span>,
+        <span class="pl-s"><span class="pl-pds">"</span>parent<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>192<span class="pl-pds">"</span></span>
+      },
+      <span class="pl-s"><span class="pl-pds">"</span>1041<span class="pl-pds">"</span></span>: {
+        <span class="pl-s"><span class="pl-pds">"</span>ddc<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>523<span class="pl-pds">"</span></span>,
+        <span class="pl-s"><span class="pl-pds">"</span>name<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>Πλανήτες<span class="pl-pds">"</span></span>,
+        <span class="pl-s"><span class="pl-pds">"</span>parent<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>1040<span class="pl-pds">"</span></span>
+      },
+      <span class="pl-s"><span class="pl-pds">"</span>780<span class="pl-pds">"</span></span>: {
+        <span class="pl-s"><span class="pl-pds">"</span>ddc<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>523.01<span class="pl-pds">"</span></span>,
+        <span class="pl-s"><span class="pl-pds">"</span>name<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>Αστροφυσική<span class="pl-pds">"</span></span>,
+        <span class="pl-s"><span class="pl-pds">"</span>parent<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>1041<span class="pl-pds">"</span></span>
+      },
+      <span class="pl-s"><span class="pl-pds">"</span>2105<span class="pl-pds">"</span></span>: {
+        <span class="pl-s"><span class="pl-pds">"</span>ddc<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>523.083<span class="pl-pds">"</span></span>,
+        <span class="pl-s"><span class="pl-pds">"</span>name<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>Πλανήτες - Βιβλία για παιδιά<span class="pl-pds">"</span></span>,
+        <span class="pl-s"><span class="pl-pds">"</span>parent<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>1041<span class="pl-pds">"</span></span>
+      },
+      <span class="pl-s"><span class="pl-pds">"</span>576<span class="pl-pds">"</span></span>: {
+        <span class="pl-s"><span class="pl-pds">"</span>ddc<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>523.1<span class="pl-pds">"</span></span>,
+        <span class="pl-s"><span class="pl-pds">"</span>name<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>Κοσμολογία<span class="pl-pds">"</span></span>,
+        <span class="pl-s"><span class="pl-pds">"</span>parent<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>1041<span class="pl-pds">"</span></span>
+      },
+      <span class="pl-s"><span class="pl-pds">"</span>current<span class="pl-pds">"</span></span>: {
+        <span class="pl-s"><span class="pl-pds">"</span>ddc<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>523<span class="pl-pds">"</span></span>,
+        <span class="pl-s"><span class="pl-pds">"</span>name<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>Πλανήτες<span class="pl-pds">"</span></span>,
+        <span class="pl-s"><span class="pl-pds">"</span>parent<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>1040<span class="pl-pds">"</span></span>,
+        <span class="pl-s"><span class="pl-pds">"</span>b_id<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>1041<span class="pl-pds">"</span></span>
+      }
+    }
+  ]
+}</pre></div>
+
+<p>Notice that the last item is the current category. The rest is the category tree.</p>
+
+<h3>
+<a id="where-do-ids-point" class="anchor" href="#where-do-ids-point" aria-hidden="true"><span class="octicon octicon-link"></span></a>Where do IDs point?</h3>
+
+<p>The id of each data type points to the corresponding type webpage.
+Take a look at this table:</p>
+
+<table>
+<thead>
+<tr>
+<th>ID</th>
+<th align="center">Data Type</th>
+<th>Target Webpage</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>103788</td>
+<td align="center">book</td>
+<td><a href="http://biblionet.gr/book/103788">http://biblionet.gr/book/103788</a></td>
+</tr>
+<tr>
+<td>10207</td>
+<td align="center">author</td>
+<td><a href="http://biblionet.gr/author/10207">http://biblionet.gr/author/10207</a></td>
+</tr>
+<tr>
+<td>20</td>
+<td align="center">publisher</td>
+<td><a href="http://biblionet.gr/com/20">http://biblionet.gr/com/20</a></td>
+</tr>
+<tr>
+<td>1041</td>
+<td align="center">category</td>
+<td><a href="http://biblionet.gr/index/1041">http://biblionet.gr/index/1041</a></td>
+</tr>
+</tbody>
+</table>
+
+<p>So if you want to use the uri option provide the target webpage's url as seen above without any slugs after th id.</p>
+
+<h2>
+<a id="contributing" class="anchor" href="#contributing" aria-hidden="true"><span class="octicon octicon-link"></span></a>Contributing</h2>
+
+<ol>
+<li>Fork it ( <a href="https://github.com/%5Bmy-github-username%5D/bookshark/fork">https://github.com/[my-github-username]/bookshark/fork</a> )</li>
+<li>Create your feature branch (<code>git checkout -b my-new-feature</code>)</li>
+<li>Commit your changes (<code>git commit -am 'Add some feature'</code>)</li>
+<li>Push to the branch (<code>git push origin my-new-feature</code>)</li>
+<li>Create a new Pull Request</li>
+</ol>
+      </section>
+
+      <footer>
+        <span class="ribbon-outer">
+          <span class="ribbon-inner">
+            <p>this project by <a href="https://github.com/dklisiaris">dklisiaris</a> can be found on <a href="https://github.com/dklisiaris/bookshark">GitHub</a></p>
+          </span>
+          <span class="left-tail"></span>
+          <span class="right-tail"></span>
+        </span>
+        <p>Generated with <a href="https://pages.github.com">GitHub Pages</a> using Merlot</p>
+        <span class="octocat"></span>
+      </footer>
+
+    </div>
+
+              <script type="text/javascript">
+            var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+            document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+          </script>
+          <script type="text/javascript">
+            try {
+              var pageTracker = _gat._getTracker("UA-60418692-3");
+            pageTracker._trackPageview();
+            } catch(err) {}
+          </script>
+
+  </body>
+</html>
