@@ -97,7 +97,8 @@ module Biblionet
         # Change keys. Use the same as in bookstores.
         mappings                      = {"Διεύθυνση" => :address, "Τηλ" => :telephone, "FAX" => :fax, "E-mail" => :email, "Web site" => :website}
         headquarters_hash             = Hash[headquarters_hash.map {|k, v| [mappings[k], v] }]
-        headquarters_hash[:website]  = headquarters_hash[:website].split(',').map(&:strip) if headquarters_hash[:website].include? ','
+        headquarters_hash[:telephone] = [headquarters_hash[:telephone]] unless headquarters_hash[:telephone].kind_of?(Array)
+        headquarters_hash[:website]   = headquarters_hash[:website].split(',').map(&:strip) if (headquarters_hash[:website] and headquarters_hash[:website].include? ',')
 
         return headquarters_hash                
       end
@@ -131,10 +132,20 @@ module Biblionet
           elsif item =~ regex_email            
             bookstores_hash[key][:email]      = (regex_email.match(item))[0]                        
           elsif item =~ regex_url            
-            bookstores_hash[key][:website]    = item[regex_url,1]            
-          else
+            bookstores_hash[key][:website]    = item[regex_url,1]          
+          else     
             address_array << item.gsub(/,$/, '').strip            
-            bookstores_hash[key][:address]    = address_array            
+            bookstores_hash[key][:address]   = address_array                  
+
+            # if address_array.empty?
+            #   address_array << item.gsub(/,$/, '').strip            
+            #   bookstores_hash[key][:address]   = address_array   
+            # else
+            #   key           = key + ' 2'
+            #   address_array = []
+            #   tel_array     = [] 
+            # end
+
           end
 
         end

@@ -11,7 +11,7 @@ require 'bookshark/crawlers/base'
 require 'bookshark/crawlers/publisher_crawler'
 
 module Bookshark
-  DEFAULTS = {
+  DEFAULTS ||= {
     site: 'biblionet',
     format: 'hash'
   }

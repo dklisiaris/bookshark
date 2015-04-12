@@ -3,7 +3,7 @@ require 'json'
 
 module FileManager
 
-  DEFAULTS = {
+  DEFAULTS ||= {
     path: '',
     all: false,
     extension: '',

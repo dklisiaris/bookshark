@@ -15,7 +15,7 @@ require File.expand_path(File.join(File.dirname(__FILE__), '../storage', 'file_m
 module Biblionet
   module Extractors
     
-    BASE_URL = "http://www.biblionet.gr"
+    BASE_URL ||= "http://www.biblionet.gr"
 
     class Base
       include FileManager
