@@ -2,7 +2,7 @@
 ![Bookshark Logo](https://dl.dropboxusercontent.com/u/4888041/bookshark/logo.png)
 
 A ruby library for book metadata extraction from biblionet.gr which
-extracts books, authors, publishers and ddc metatdata.
+extracts books, authors, publishers and ddc metadata.
 The representation of bibliographic metadata in JSON is inspired by [BibJSON](http://okfnlabs.org/bibjson/) but some tags may be different.
 
 [![Build Status](https://travis-ci.org/dklisiaris/bookshark.svg?branch=master)](https://travis-ci.org/dklisiaris/bookshark)
@@ -13,7 +13,7 @@ The representation of bibliographic metadata in JSON is inspired by [BibJSON](ht
 Add this line to your application's Gemfile:
 
 ```ruby
-gem 'bookshark', "~> 1.0.0.alpha"
+gem 'bookshark', "~> 1.0.0.beta"
 ```
 
 And then execute:

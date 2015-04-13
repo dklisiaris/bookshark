@@ -104,54 +104,57 @@ module Biblionet
       end
 
       def bookstores
-        bookstores_hash = Hash.new { |h,k| h[k] = {} }
-        address_array   = []
-        tel_array       = []
+          bookstores_hash = Hash.new { |h,k| h[k] = {} }
+          address_array   = []
+          tel_array       = []
 
-        # Defaunt key in case there is none.
-        key = 'Βιβλιοπωλείο'
+          # Defaunt key in case there is none.
+          key = 'Βιβλιοπωλείο'
 
-        @nodeset.css('//p[align="justify"]').inner_html.split('<br>').map(&:strip).reject(&:empty?).each do |item|          
-          regex_tel   = /\d{3} \d{7}/
-          regex_tk    = /\d{3} \d{2}/
-          regex_email = /([\w+\-].?)+@[a-z\d\-]+(\.[a-z]+)*\.[a-z]+/i
-          regex_url   = /((http(?:s)?\:\/\/)?[a-zA-Z0-9\-]+(?:\.[a-zA-Z0-9\-]+)*\.[a-zA-Z]{2,6}(?:\/?|(?:\/[\w\-]+)*)(?:\/?|\/\w+\.[a-zA-Z]{2,4}(?:\?[\w]+\=[\w\-]+)?)?(?:\&[\w]+\=[\w\-]+)*)/ix
-          
-          if item.end_with?(":")                   
-            key           = item[0..-2]
-            address_array = []
-            tel_array     = []
-          elsif (item.start_with?("Fax") or item.start_with?("fax")) and item =~ regex_tel            
-            bookstores_hash[key][:fax]        = item.gsub(/[^\d{3} \d{2}]/, '').strip            
-          elsif item =~ regex_tel
-            tel_array << item.gsub(/[^\d{3} \d{2}]/, '').strip            
-            bookstores_hash[key][:telephone]  = tel_array            
-          elsif item =~ regex_tk
-            address_array << item.gsub(/,$/, '').strip                       
-            bookstores_hash[key][:address]    = address_array            
-          elsif item =~ regex_email            
-            bookstores_hash[key][:email]      = (regex_email.match(item))[0]                        
-          elsif item =~ regex_url            
-            bookstores_hash[key][:website]    = item[regex_url,1]          
-          else     
-            address_array << item.gsub(/,$/, '').strip            
-            bookstores_hash[key][:address]   = address_array                  
-
-            # if address_array.empty?
-            #   address_array << item.gsub(/,$/, '').strip            
-            #   bookstores_hash[key][:address]   = address_array   
-            # else
-            #   key           = key + ' 2'
-            #   address_array = []
-            #   tel_array     = [] 
-            # end
-
+          @nodeset.css('//p[align="justify"]').inner_html.split('<br><br>').map(&:strip).reject(&:empty?).each do |item_group|
+            if item_group.end_with?(":")
+              key           = item_group[0..-2]
+              address_array = []
+              tel_array     = []
+            else        
+              if bookstores_hash[key].any?          
+                key[-1].to_i
+                key += ((key[-1].to_i > 0) ? (' '+(key[-1].to_i+1).to_s) : ' 2')
+                address_array = []
+                tel_array     = []         
+              end        
+              item_group.split('<br>').each do |item|          
+                regex_tel   = /\d{3,5} \d{5,7}/
+                regex_tk    = /\d{3} \d{2}/
+                regex_email = /([\w+\-].?)+@[a-z\d\-]+(\.[a-z]+)*\.[a-z]+/i
+                regex_url   = /((http(?:s)?\:\/\/)?[a-zA-Z0-9\-]+(?:\.[a-zA-Z0-9\-]+)*\.[a-zA-Z]{2,6}(?:\/?|(?:\/[\w\-]+)*)(?:\/?|\/\w+\.[a-zA-Z]{2,4}(?:\?[\w]+\=[\w\-]+)?)?(?:\&[\w]+\=[\w\-]+)*)/ix
+                
+                if item.end_with?(":")                   
+                  key           = item[0..-2]
+                  address_array = []
+                  tel_array     = []
+                elsif (item.start_with?("Fax") or item.start_with?("fax")) and item =~ regex_tel            
+                  bookstores_hash[key][:fax]        = item.gsub(/[^\d{3} \d{2}]/, '').strip            
+                elsif item =~ regex_tel
+                  tel_array << item.gsub(/[^\d{3} \d{2}]/, '').strip            
+                  bookstores_hash[key][:telephone]  = tel_array            
+                elsif item =~ regex_tk
+                  address_array << item.gsub(/,$/, '').strip                       
+                  bookstores_hash[key][:address]    = address_array            
+                elsif item =~ regex_email            
+                  bookstores_hash[key][:email]      = (regex_email.match(item))[0]                        
+                elsif item =~ regex_url            
+                  bookstores_hash[key][:website]    = item[regex_url,1]          
+                else     
+                  address_array << item.gsub(/,$/, '').strip            
+                  bookstores_hash[key][:address]   = address_array                            
+                end
+              end                
+            end      
           end
-
-        end
-
-        return bookstores_hash
-      end      
+          
+          return bookstores_hash
+        end     
 
     end  
 
