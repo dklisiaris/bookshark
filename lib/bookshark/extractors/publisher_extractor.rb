@@ -152,7 +152,7 @@ module Biblionet
               end                
             end      
           end
-          
+          bookstores_hash.delete_if { |k, v| v.empty? }
           return bookstores_hash
         end     
 
