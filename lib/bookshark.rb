@@ -119,6 +119,54 @@ module Bookshark
       return response       
     end
 
+    def books_from_storage
+      extract_from_storage_and_save('book', 'html_book_pages', 'json_book_pages')
+    end
+
+    def authors_from_storage
+      extract_from_storage_and_save('author', 'html_author_pages', 'json_author_pages')
+    end
+
+    def publishers_from_storage
+      extract_from_storage_and_save('publisher', 'html_publisher_pages', 'json_publisher_pages')
+    end
+
+    def categories_from_storage
+      extract_from_storage_and_save('category', 'html_category_pages', 'json_category_pages')
+    end
+
+    def extract_from_storage_and_save(metadata_type, source_dir, target_dir)      
+      list_directories(path: Bookshark.path_to_storage + '/' + source_dir).each do |dir|
+        dir_to_save = dir.gsub(source_dir, target_dir)        
+
+        list_files(path: dir, extension: 'html', all:true).each do |file|
+          puts "Extracting from file: " + file.to_s          
+
+          # Extract publisher metadata form local file.
+          options = {uri: file, format: 'pretty_json', local: true}          
+          
+          case metadata_type
+          when 'author'
+            record = author(options)
+          when 'publisher'
+            record = publisher(options)
+          when 'book'
+            record = book(options)
+          when 'category'
+            record = category(options)       
+          end  
+
+          # Prepare a path to save the new file.
+          filename  = File.basename(file,".*")
+          path_to_save = "#{dir_to_save}#{filename}.json"
+      
+          # Save to file.        
+          save_to("#{path_to_save}", record)
+          
+        end # unless File.directory?(dir_to_save) # if dir.end_with? '/195/'
+      end
+    end
+
     def parse_all_categories(will_save=false)
       # list_directories('raw_ddc_pages').each do |dir|
         # p dir
@@ -166,9 +214,8 @@ module Bookshark
     private
 
     def process_options(options = {}, caller = nil)
-      # puts caller_locations(1,1)[0].label
-      # options[:format] ||= @format
-      puts caller
+      # puts "Called from method: " + caller.to_s
+
       id = options[:id]
 
       if id

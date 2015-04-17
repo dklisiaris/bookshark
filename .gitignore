@@ -8,7 +8,12 @@
 /pkg/
 /spec/reports/
 /tmp/
+/lib/bookshark/storage/html_book_pages/
+/lib/bookshark/storage/html_author_pages/
 /lib/bookshark/storage/html_publisher_pages/
+/lib/bookshark/storage/json_book_pages/
+/lib/bookshark/storage/json_author_pages/
+/lib/bookshark/storage/json_publisher_pages/
 /lib/bookshark/logs/*.log
 *.bundle
 *.so
