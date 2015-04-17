@@ -28,7 +28,7 @@ module Biblionet
                 
         headquarters                    = page.headquarters
         bookstores                      = page.bookstores
-        bookstores['Έδρα']              = headquarters 
+        bookstores['Έδρα']              = headquarters unless headquarters.all? {|k,v| v.nil? or v.empty?}
 
         publisher_hash = {}
         publisher_hash[:name]          = page.name
@@ -97,7 +97,7 @@ module Biblionet
         # Change keys. Use the same as in bookstores.
         mappings                      = {"Διεύθυνση" => :address, "Τηλ" => :telephone, "FAX" => :fax, "E-mail" => :email, "Web site" => :website}
         headquarters_hash             = Hash[headquarters_hash.map {|k, v| [mappings[k], v] }]
-        headquarters_hash[:telephone] = [headquarters_hash[:telephone]] unless headquarters_hash[:telephone].kind_of?(Array)
+        headquarters_hash[:telephone] = [headquarters_hash[:telephone]] unless headquarters_hash[:telephone].kind_of?(Array) or headquarters_hash[:telephone].nil?
         headquarters_hash[:website]   = headquarters_hash[:website].split(',').map(&:strip) if (headquarters_hash[:website] and headquarters_hash[:website].include? ',')
 
         return headquarters_hash                
