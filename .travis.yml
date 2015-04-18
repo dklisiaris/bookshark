@@ -1,3 +1,5 @@
+notifications:
+  slack: bibliography:gIEyQx7yEqCDHlXaBxBLsKlo
 language: ruby
 rvm:
   - 2.2.0
