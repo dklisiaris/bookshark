@@ -21,7 +21,7 @@ Gem::Specification.new do |spec|
   spec.require_paths = ["lib"]
 
   spec.add_dependency "nokogiri", "~> 1.6", ">= 1.6.6"
-  spec.add_dependency "sanitize", "~> 3.1"
+  spec.add_dependency "sanitize", "~> 4.0"
   spec.add_dependency "json", "~> 1.8"
   spec.add_dependency "htmlentities", "~> 4.3"
 
