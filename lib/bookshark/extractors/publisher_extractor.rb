@@ -99,6 +99,7 @@ module Biblionet
         headquarters_hash             = Hash[headquarters_hash.map {|k, v| [mappings[k], v] }]
         headquarters_hash[:telephone] = [headquarters_hash[:telephone]] unless headquarters_hash[:telephone].kind_of?(Array) or headquarters_hash[:telephone].nil?
         headquarters_hash[:website]   = headquarters_hash[:website].split(',').map(&:strip) if (headquarters_hash[:website] and headquarters_hash[:website].include? ',')
+        headquarters_hash[:address]   = [headquarters_hash[:address]] unless headquarters_hash[:address].kind_of?(Array) 
 
         return headquarters_hash                
       end
