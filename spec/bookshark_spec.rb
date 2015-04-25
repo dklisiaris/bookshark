@@ -206,4 +206,8 @@ describe Bookshark::Extractor do
     end
   end
 
+  describe 'Biblionet::Extractors::BibliographicalBook' do 
+    
+  end
+
 end

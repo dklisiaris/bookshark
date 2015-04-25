@@ -4,6 +4,7 @@ require 'bookshark/storage/file_manager'
 require 'bookshark/extractors/author_extractor'
 require 'bookshark/extractors/category_extractor'
 require 'bookshark/extractors/book_extractor'
+require 'bookshark/extractors/bibliographical_book_extractor'
 require 'bookshark/extractors/publisher_extractor'
 require 'bookshark/extractors/search'
 
@@ -231,7 +232,7 @@ module Bookshark
           local_path    = "html_book_pages/#{((id-1)/1000)}/book_#{id}.html"
         when 'category'
           url_method    = 'index' 
-          local_path    = "html_ddc_pages/#{((id-1)/1000)}/ddc_#{id}.html"       
+          local_path    = "html_ddc_pages/#{((id-1)/1000)}/ddc_#{id}.html"               
         else
           puts "Called from unknown method. Probably its rspec."
         end      

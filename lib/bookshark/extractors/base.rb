@@ -141,6 +141,10 @@ module Biblionet
       # +encoded_text+:: the text which contains encoded entities
       #
       def decode_text(encoded_text)
+        self.class.decode_text(encoded_text)
+      end
+
+      def self.decode_text(encoded_text)
         # encoded_text = File.read(encoded_file_path)
         coder = HTMLEntities.new
         coder.decode(encoded_text)
