@@ -92,6 +92,21 @@ module Bookshark
       return response            
     end
 
+    
+    # def bibliographical_book(options = {})
+    #   bibliographical_book_extractor = Biblionet::Extractors::BibliographicalBookExtractor.new
+ 
+    #   uri = "http://www.biblionet.gr/main.asp?page=results&Titlesid=#{options[:id]}"
+    #   options[:format]  ||= @format
+ 
+    #   book = bibliographical_book_extractor.load_and_extract_book(uri)
+ 
+    #   response = {}      
+    #   response[:book] = !book.nil? ? [book] : []
+    #   response = change_format(response, options[:format])
+    #   response = bibliographical_book_extractor.decode_text(response)      
+    # end    
+
     def category(options = {})
       uri = process_options(options, __method__)
       options[:format] ||= @format      
