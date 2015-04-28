@@ -107,9 +107,9 @@ module Biblionet
         pre_details_text = @nodeset.xpath("//span[@class='small'][1]/preceding::text()").text
         pre_details_text = BibliographicalBookExtractor.decode_text(pre_details_text)
 
-        series_regex        = /(?<=\()\p{Word}+( \p{Word}+)* · \d+(?=\))/
-        series_regex_no_vol = /(?<=\()\p{Word}+( \p{Word}+)*(?=\))/
-        series_name_regex   = /\p{Word}+( \p{Word}+)*(?= ·)/
+        series_regex        = /(?<=\()\p{Word}+( \S)?( \p{Word}+( \S)?)* · \d+(?=\))/
+        series_regex_no_vol = /(?<=\()\p{Word}+( \S)?( \p{Word}+( \S)?)*(?=\))/
+        series_name_regex   = /\p{Word}+( \S)?( \p{Word}+( \S)?)*(?= ·)/
         series_volume_regex = /(?<=· )\d+/
         physical_size_regex = /\d+x\d+/        
 
@@ -127,6 +127,29 @@ module Biblionet
         details_hash[:series] = series_hash
         
         details_hash[:physical_size] = (pre_details_text =~ physical_size_regex) ? pre_details_text[physical_size_regex] : nil
+
+        format_regex = /(?<=\[).+(?=\])/
+
+        after_title_text = @nodeset.xpath("//a[@class='booklink' and @href[contains(.,'/book/') ]][1]").first.next_sibling.text.strip
+        format = after_title_text[format_regex] if after_title_text =~ format_regex
+
+        details_hash[:format] = format.nil? ? 'Βιβλίο' : format
+
+        publisher_node = @nodeset.xpath("//a[@class='booklink' and @href[contains(.,'/com/') ]][1]").first
+        publisher_hash = {}
+        publisher_hash[:text] = publisher_node.text
+        publisher_hash[:b_id] = (publisher_node[:href].split("/"))[2]
+
+        pre_publisher_text = BibliographicalBookExtractor.decode_text(publisher_node.previous_sibling.text)
+        after_publisher_text = BibliographicalBookExtractor.decode_text(publisher_node.next_sibling.text)
+
+        publication_hash = {}
+        publication_hash[:year] = after_publisher_text[/(?<=, )\d+(?=\.)/]
+        publication_hash[:version] = pre_details_text[/(?<=- )\d+(?=η)/]
+        publication_hash[:place] = pre_details_text[/(?<=- )\p{Word}+( \S)?( \p{Word}+( \S)?)*(?= :)/]
+
+        details_hash[:publisher] = publisher_hash
+        details_hash[:publication] = publication_hash
 
         details_hash
       end

@@ -106,6 +106,8 @@ module Bookshark
     #   response = change_format(response, options[:format])
     #   response = bibliographical_book_extractor.decode_text(response)      
     # end    
+    
+    # puts Bookshark::Extractor.new(format: 'pretty_json').bibliographical_book(id: 103788)
 
     def category(options = {})
       uri = process_options(options, __method__)
