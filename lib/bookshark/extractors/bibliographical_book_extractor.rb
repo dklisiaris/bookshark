@@ -31,10 +31,22 @@ module Biblionet
 
         bibliographical_book_hash = Hash.new   
 
-        # bibliographical_book_hash['title'] = page.title
-        bibliographical_book_hash['details'] = page.details
-        # bibliographical_book_hash['title'] = page.title
-        # bibliographical_book_hash['title'] = page.title
+        extracted_details = page.details
+
+        bibliographical_book_hash[:original_language] = extracted_details[:original_language]
+        bibliographical_book_hash[:original_title]    = extracted_details[:original_title]
+        bibliographical_book_hash[:last_update]       = extracted_details[:last_update]
+        bibliographical_book_hash[:cover_type]        = extracted_details[:cover_type]
+        bibliographical_book_hash[:availability]      = extracted_details[:availability]
+        bibliographical_book_hash[:price]             = extracted_details[:price]
+
+        bibliographical_book_hash[:series]            = extracted_details[:series]
+        bibliographical_book_hash[:physical_size]     = extracted_details[:physical_size]
+
+        bibliographical_book_hash[:format]            = extracted_details[:format]
+
+        bibliographical_book_hash[:publisher]         = extracted_details[:publisher]
+        bibliographical_book_hash[:publication]       = extracted_details[:publication]
         
         return @bibliographical_book = bibliographical_book_hash
       end

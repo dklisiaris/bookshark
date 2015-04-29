@@ -2,6 +2,7 @@
 # encoding: utf-8
 
 require_relative 'base'
+require_relative 'bibliographical_book_extractor'
 require 'sanitize'
 
 module Biblionet
@@ -169,12 +170,12 @@ module Biblionet
 
         details_hash = proccess_details(details)
 
-        book_hash[:publication_year] = details_hash[:publication_year]
-        book_hash[:pages]            = details_hash[:pages]
+        # book_hash[:publication_year] = details_hash[:publication_year]
+        # book_hash[:pages]            = details_hash[:pages]
         book_hash[:isbn]             = details_hash[:isbn]
         book_hash[:isbn_13]          = details_hash[:isbn_13].nil? ? nil : details_hash[:isbn_13]
-        book_hash[:status]           = details_hash[:status]
-        book_hash[:price]            = details_hash[:price]
+        # book_hash[:status]           = details_hash[:status]
+        # book_hash[:price]            = details_hash[:price]
         book_hash[:award]            = page.awards
 
 
@@ -192,7 +193,34 @@ module Biblionet
 
 
         book_hash[:category]   = ddcs
-        book_hash[:b_id] = biblionet_id 
+        book_hash[:b_id] = biblionet_id
+
+        uri = "http://www.biblionet.gr/main.asp?page=results&Titlesid=#{biblionet_id}"
+
+        bibliographical_book_extractor = Biblionet::Extractors::BibliographicalBookExtractor.new
+        bibliographical_details = bibliographical_book_extractor.load_and_extract_book(uri)      
+
+        book_hash[:publisher]         = bibliographical_details[:publisher]
+        book_hash[:publication]       = bibliographical_details[:publication]   
+
+        book_hash[:format]            = bibliographical_details[:format]     
+
+        book_hash[:original_language] = bibliographical_details[:original_language]
+        book_hash[:original_title]    = bibliographical_details[:original_title]
+
+        book_hash[:price]             = bibliographical_details[:price]      
+        book_hash[:availability]      = bibliographical_details[:availability]
+        book_hash[:last_update]       = bibliographical_details[:last_update]
+        
+        book_hash[:series]            = bibliographical_details[:series]        
+
+        physical_description_hash = {}
+        physical_description_hash[:pages]      = details_hash[:pages]
+        physical_description_hash[:size]       = bibliographical_details[:physical_size]
+        physical_description_hash[:cover_type] = bibliographical_details[:cover_type]
+
+        book_hash[:physical_description] = physical_description_hash
+        
 
         return @book = book_hash  
       end      

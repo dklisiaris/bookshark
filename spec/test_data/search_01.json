@@ -13,15 +13,11 @@
       "contributors": {
       },
       "publisher": {
-        "name": "Λογοσοφία",
+        "text": "Λογοσοφία",
         "b_id": "7628"
       },
-      "publication_year": "2007",
-      "pages": "181",
       "isbn": "978-960-89288-3-1",
       "isbn_13": null,
-      "status": "Κυκλοφορεί",
-      "price": "13,52",
       "award": [
 
       ],
@@ -33,7 +29,25 @@
           "b_id": "3"
         }
       ],
-      "b_id": "119000"
+      "b_id": "119000",
+      "publication": {
+        "year": "2007",
+        "version": "1",
+        "place": "Αθήνα"
+      },
+      "format": "Βιβλίο",
+      "original_language": null,
+      "original_title": null,
+      "price": "13,52",
+      "availability": "Κυκλοφορεί",
+      "last_update": "9/5/2007",
+      "series": {
+      },
+      "physical_description": {
+        "pages": "181",
+        "size": "21x14",
+        "cover_type": "Μαλακό εξώφυλλο"
+      }
     },
     {
       "title": "Σημεία και τέρατα της οικονομίας",
@@ -58,15 +72,11 @@
         ]
       },
       "publisher": {
-        "name": "Εκδοτικός Οίκος Α. Α. Λιβάνη",
+        "text": "Εκδοτικός Οίκος Α. Α. Λιβάνη",
         "b_id": "271"
       },
-      "publication_year": "2006",
-      "pages": "326",
       "isbn": "960-14-1157-7",
       "isbn_13": "978-960-14-1157-6",
-      "status": "Κυκλοφορεί",
-      "price": "16,31",
       "award": [
 
       ],
@@ -78,7 +88,27 @@
           "b_id": "142"
         }
       ],
-      "b_id": "103788"
+      "b_id": "103788",
+      "publication": {
+        "year": "2006",
+        "version": "1",
+        "place": "Αθήνα"
+      },
+      "format": "Βιβλίο",
+      "original_language": "αγγλικά",
+      "original_title": "Freakonomics",
+      "price": "16,31",
+      "availability": "Κυκλοφορεί",
+      "last_update": "27/1/2006",
+      "series": {
+        "name": "Οικονομία",
+        "volume": null
+      },
+      "physical_description": {
+        "pages": "326",
+        "size": "21x14",
+        "cover_type": "Μαλακό εξώφυλλο"
+      }
     },
     {
       "title": "Και άλλα σημεία και τέρατα από την ιστορία",
@@ -103,15 +133,11 @@
         ]
       },
       "publisher": {
-        "name": "Modern Times",
+        "text": "Modern Times",
         "b_id": "191"
       },
-      "publication_year": "2004",
-      "pages": "62",
       "isbn": "960-397-927-9",
       "isbn_13": "978-960-397-927-2",
-      "status": "Κυκλοφορεί",
-      "price": "15,14",
       "award": [
 
       ],
@@ -123,7 +149,25 @@
           "b_id": "2456"
         }
       ],
-      "b_id": "87815"
+      "b_id": "87815",
+      "publication": {
+        "year": "2004",
+        "version": null,
+        "place": "Αθήνα"
+      },
+      "format": "Βιβλίο",
+      "original_language": "αγγλικά",
+      "original_title": "Even more horrible history",
+      "price": "15,14",
+      "availability": "Κυκλοφορεί",
+      "last_update": null,
+      "series": {
+      },
+      "physical_description": {
+        "pages": "62",
+        "size": "28x22",
+        "cover_type": "Σκληρό εξώφυλλο"
+      }
     },
     {
       "title": "Σημεία και τέρατα από την ιστορία",
@@ -148,15 +192,11 @@
         ]
       },
       "publisher": {
-        "name": "Modern Times",
+        "text": "Modern Times",
         "b_id": "191"
       },
-      "publication_year": "2004",
-      "pages": "78",
       "isbn": "960-397-926-0",
       "isbn_13": "978-960-397-926-5",
-      "status": "Κυκλοφορεί",
-      "price": "15,14",
       "award": [
 
       ],
@@ -168,7 +208,25 @@
           "b_id": "2456"
         }
       ],
-      "b_id": "87812"
+      "b_id": "87812",
+      "publication": {
+        "year": "2004",
+        "version": null,
+        "place": "Αθήνα"
+      },
+      "format": "Βιβλίο",
+      "original_language": "αγγλικά",
+      "original_title": "Horrible history",
+      "price": "15,14",
+      "availability": "Κυκλοφορεί",
+      "last_update": null,
+      "series": {
+      },
+      "physical_description": {
+        "pages": "78",
+        "size": "28x22",
+        "cover_type": "Σκληρό εξώφυλλο"
+      }
     },
     {
       "title": "Σημεία και τέρατα",
@@ -183,15 +241,11 @@
       "contributors": {
       },
       "publisher": {
-        "name": "Κέδρος",
+        "text": "Κέδρος",
         "b_id": "21"
       },
-      "publication_year": "1994",
-      "pages": "126",
       "isbn": "960-04-0941-2",
       "isbn_13": "978-960-04-0941-3",
-      "status": "Κυκλοφορεί",
-      "price": "9,17",
       "award": [
 
       ],
@@ -203,7 +257,25 @@
           "b_id": "9"
         }
       ],
-      "b_id": "15839"
+      "b_id": "15839",
+      "publication": {
+        "year": "1994",
+        "version": "2",
+        "place": "Αθήνα"
+      },
+      "format": "Βιβλίο",
+      "original_language": null,
+      "original_title": null,
+      "price": "9,17",
+      "availability": "Κυκλοφορεί",
+      "last_update": "28/7/2010",
+      "series": {
+      },
+      "physical_description": {
+        "pages": "126",
+        "size": "21x14",
+        "cover_type": "Μαλακό εξώφυλλο"
+      }
     },
     {
       "title": "Επίσημη αγραμματοσύνη",
@@ -218,15 +290,11 @@
       "contributors": {
       },
       "publisher": {
-        "name": "Περιοδικό Πνευματική Ζωή",
+        "text": "Περιοδικό Πνευματική Ζωή",
         "b_id": "6770"
       },
-      "publication_year": null,
-      "pages": "48",
       "isbn": null,
       "isbn_13": null,
-      "status": "Κυκλοφορεί",
-      "price": null,
       "award": [
 
       ],
@@ -238,7 +306,27 @@
           "b_id": "1459"
         }
       ],
-      "b_id": "77381"
+      "b_id": "77381",
+      "publication": {
+        "year": null,
+        "version": null,
+        "place": "Αθήνα"
+      },
+      "format": "Βιβλίο",
+      "original_language": null,
+      "original_title": null,
+      "price": null,
+      "availability": "Κυκλοφορεί",
+      "last_update": null,
+      "series": {
+        "name": "Νεοελληνικά Αφιερώματα",
+        "volume": "21"
+      },
+      "physical_description": {
+        "pages": "48",
+        "size": "24x17",
+        "cover_type": "Μαλακό εξώφυλλο"
+      }
     },
     {
       "title": "Ο όλεθρος της πυραμίδος Καμπαλά",
@@ -259,15 +347,11 @@
         ]
       },
       "publisher": {
-        "name": "Μπίμπης Στερέωμα",
+        "text": "Μπίμπης Στερέωμα",
         "b_id": "244"
       },
-      "publication_year": null,
-      "pages": "269",
       "isbn": null,
       "isbn_13": null,
-      "status": "Κυκλοφορεί",
-      "price": "6,85",
       "award": [
 
       ],
@@ -279,7 +363,25 @@
           "b_id": "179"
         }
       ],
-      "b_id": "46856"
+      "b_id": "46856",
+      "publication": {
+        "year": null,
+        "version": null,
+        "place": "Θεσσαλονίκη"
+      },
+      "format": "Βιβλίο",
+      "original_language": null,
+      "original_title": null,
+      "price": "6,85",
+      "availability": "Κυκλοφορεί",
+      "last_update": null,
+      "series": {
+      },
+      "physical_description": {
+        "pages": "269",
+        "size": "21x14",
+        "cover_type": "Μαλακό εξώφυλλο"
+      }
     },
     {
       "title": "Η επανάσταση κατά της νέας τάξης",
@@ -294,15 +396,11 @@
       "contributors": {
       },
       "publisher": {
-        "name": "Μπίμπης Στερέωμα",
+        "text": "Μπίμπης Στερέωμα",
         "b_id": "244"
       },
-      "publication_year": null,
-      "pages": "71",
       "isbn": null,
       "isbn_13": null,
-      "status": "Κυκλοφορεί",
-      "price": "3,73",
       "award": [
 
       ],
@@ -314,7 +412,25 @@
           "b_id": "2336"
         }
       ],
-      "b_id": "46763"
+      "b_id": "46763",
+      "publication": {
+        "year": null,
+        "version": null,
+        "place": "Θεσσαλονίκη"
+      },
+      "format": "Βιβλίο",
+      "original_language": null,
+      "original_title": null,
+      "price": "3,73",
+      "availability": "Κυκλοφορεί",
+      "last_update": null,
+      "series": {
+      },
+      "physical_description": {
+        "pages": "71",
+        "size": "21x14",
+        "cover_type": "Μαλακό εξώφυλλο"
+      }
     },
     {
       "title": "Επιχείρησις: Μαργαριτάρια",
@@ -329,15 +445,11 @@
       "contributors": {
       },
       "publisher": {
-        "name": "Δωδώνη Εκδοτική ΕΠΕ",
+        "text": "Δωδώνη Εκδοτική ΕΠΕ",
         "b_id": "1"
       },
-      "publication_year": null,
-      "pages": "188",
       "isbn": "960-248-541-8",
       "isbn_13": "978-960-248-541-5",
-      "status": "Κυκλοφορεί",
-      "price": "10,60",
       "award": [
 
       ],
@@ -349,7 +461,25 @@
           "b_id": "1309"
         }
       ],
-      "b_id": "33301"
+      "b_id": "33301",
+      "publication": {
+        "year": null,
+        "version": null,
+        "place": "Αθήνα"
+      },
+      "format": "Βιβλίο",
+      "original_language": null,
+      "original_title": null,
+      "price": "10,60",
+      "availability": "Κυκλοφορεί",
+      "last_update": null,
+      "series": {
+      },
+      "physical_description": {
+        "pages": "188",
+        "size": "20x13",
+        "cover_type": "Μαλακό εξώφυλλο"
+      }
     }
   ]
 }

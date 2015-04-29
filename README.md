@@ -145,29 +145,47 @@ The expected result of a book extraction is something like this:
         ]
       },
       "publisher": {
-        "name": "Εκδοτικός Οίκος Α. Α. Λιβάνη",
+        "text": "Εκδοτικός Οίκος Α. Α. Λιβάνη",
         "b_id": "271"
       },
-      "publication_year": "2006",
-      "pages": "326",
       "isbn": "960-14-1157-7",
       "isbn_13": "978-960-14-1157-6",
-      "status": "Κυκλοφορεί",
-      "price": "16,31",
       "award": [
+
       ],
       "description": "Τι είναι πιο επικίνδυνο, ένα όπλο ή μια πισίνα; Τι κοινό έχουν οι δάσκαλοι με τους παλαιστές του σούμο;...",
       "category": [
         {
           "ddc": "330",
-          "text": "Οικονομία",
+          "name": "Οικονομία",
           "b_id": "142"
         }
       ],
-      "b_id": "103788"
+      "b_id": "103788",
+      "publication": {
+        "year": "2006",
+        "version": "1",
+        "place": "Αθήνα"
+      },
+      "format": "Βιβλίο",
+      "original_language": "αγγλικά",
+      "original_title": "Freakonomics",
+      "price": "16,31",
+      "availability": "Κυκλοφορεί",
+      "last_update": "27/1/2006",
+      "series": {
+        "name": "Οικονομία",
+        "volume": null
+      },
+      "physical_description": {
+        "pages": "326",
+        "size": "21x14",
+        "cover_type": "Μαλακό εξώφυλλο"
+      }
     }
   ]
 }
+
 ```
 Here is a [Book Sample](https://gist.github.com/dklisiaris/a6f3d6f37806186f3c79) extracted with eager option enabled.
 

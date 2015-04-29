@@ -71,12 +71,8 @@
           "b_id": "112"
         }
       ],
-      "publication_year": "2012",
-      "pages": "345",
       "isbn": "978-960-524-394-4",
       "isbn_13": null,
-      "status": "Κυκλοφορεί",
-      "price": "16,00",
       "award": [
 
       ],
@@ -209,7 +205,27 @@
           }
         }
       ],
-      "b_id": "184923"
+      "b_id": "184923",
+      "publication": {
+        "year": "2012",
+        "version": "1",
+        "place": "Ηράκλειο Κρήτης"
+      },
+      "format": "Βιβλίο",
+      "original_language": null,
+      "original_title": null,
+      "price": "16,00",
+      "availability": "Κυκλοφορεί",
+      "last_update": "12/12/2012",
+      "series": {
+        "name": "Εκλαΐκευση της Επιστήμης",
+        "volume": null
+      },
+      "physical_description": {
+        "pages": "345",
+        "size": "24x17",
+        "cover_type": "Μαλακό εξώφυλλο"
+      }
     }
   ]
 }
