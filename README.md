@@ -13,7 +13,7 @@ The representation of bibliographic metadata in JSON is inspired by [BibJSON](ht
 Add this line to your application's Gemfile:
 
 ```ruby
-gem 'bookshark', "~> 1.0.0.beta"
+gem 'bookshark', "~> 1.0.0.pre"
 ```
 
 And then execute:
