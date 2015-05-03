@@ -172,8 +172,19 @@ module Biblionet
 
         # book_hash[:publication_year] = details_hash[:publication_year]
         # book_hash[:pages]            = details_hash[:pages]
-        book_hash[:isbn]             = details_hash[:isbn]
-        book_hash[:isbn_13]          = details_hash[:isbn_13].nil? ? nil : details_hash[:isbn_13]
+        book_hash[:isbn] = details_hash[:isbn]
+        
+        if details_hash[:isbn_13].nil?
+          if present?(details_hash[:isbn]) and (details_hash[:isbn].strip.gsub('-','').length == 13)
+            book_hash[:isbn_13] = book_hash[:isbn]
+          else
+            book_hash[:isbn_13] = nil
+          end
+        else
+          book_hash[:isbn_13] = details_hash[:isbn_13]
+        end
+
+        # book_hash[:isbn_13]          = details_hash[:isbn_13].nil? ? nil : details_hash[:isbn_13]
         # book_hash[:status]           = details_hash[:status]
         # book_hash[:price]            = details_hash[:price]
         book_hash[:award]            = page.awards

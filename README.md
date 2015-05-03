@@ -105,6 +105,11 @@ For more options, like book's title or author, use the search method which is de
   * pretty_json
 * eager : Perform eager extraction? (Boolean - default is false)
 
+Useful one-liner:
+```ruby
+puts Bookshark::Extractor.new(format: 'pretty_json').book(id: 185281)
+```
+
 #### Eager Extraction
 
 Each book has some attributes such as authors, contributors, categories etc which are actually references to other objects.   
