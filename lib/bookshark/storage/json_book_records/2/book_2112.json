@@ -1,0 +1,69 @@
+{
+  "book": [
+    {
+      "title": "Raubvögel in Griechenland",
+      "subtitle": null,
+      "image": null,
+      "author": [
+        {
+          "name": "G. Handrinos",
+          "b_id": "1185"
+        },
+        {
+          "name": "A. Dimitropoulos",
+          "b_id": "1186"
+        }
+      ],
+      "contributors": {
+        "εικονογράφηση": [
+          {
+            "name": "Ach. Dimitropoulos",
+            "b_id": "1186"
+          },
+          {
+            "name": "G. Handrinos",
+            "b_id": "1185"
+          }
+        ]
+      },
+      "publisher": {
+        "text": "Ευσταθιάδης Group",
+        "b_id": "101"
+      },
+      "isbn": "960-226-576-0",
+      "isbn_13": "978-960-226-576-5",
+      "award": [
+
+      ],
+      "description": null,
+      "category": [
+        {
+          "ddc": "598.495",
+          "name": "Πουλιά - Ελλάς",
+          "b_id": "205"
+        }
+      ],
+      "b_id": "2112",
+      "publication": {
+        "year": "1999",
+        "version": null,
+        "place": "Αθήνα"
+      },
+      "format": "Βιβλίο",
+      "original_language": null,
+      "original_title": null,
+      "price": "9,83",
+      "availability": "Κυκλοφορεί",
+      "last_update": null,
+      "series": {
+        "name": "Griechenlands Natur",
+        "volume": null
+      },
+      "physical_description": {
+        "pages": "199",
+        "size": "18x12",
+        "cover_type": "Μαλακό εξώφυλλο"
+      }
+    }
+  ]
+}

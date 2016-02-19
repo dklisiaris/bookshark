@@ -1,0 +1,69 @@
+{
+  "book": [
+    {
+      "title": "Εμένα ποιος με σκέφτηκε;",
+      "subtitle": null,
+      "image": "http://www.biblionet.gr/images/covers/b2120.jpg",
+      "author": [
+        {
+          "name": "Σοφί Τασμά",
+          "b_id": "948"
+        }
+      ],
+      "contributors": {
+        "μετάφραση": [
+          {
+            "name": "Βίτω Αγγελοπούλου",
+            "b_id": "36"
+          }
+        ],
+        "επιμέλεια σειράς": [
+          {
+            "name": "Ζωρζ Σαρή",
+            "b_id": "51"
+          },
+          {
+            "name": "Αργυρώ Κοκορέλη",
+            "b_id": "52"
+          }
+        ]
+      },
+      "publisher": {
+        "text": "Ελληνικά Γράμματα",
+        "b_id": "16"
+      },
+      "isbn": "960-344-692-0",
+      "isbn_13": "978-960-344-692-7",
+      "award": [
+
+      ],
+      "description": null,
+      "category": [
+        {
+          "ddc": "899.9",
+          "name": "Παιδική και εφηβική λογοτεχνία, Μεταφρασμένη",
+          "b_id": "378"
+        }
+      ],
+      "b_id": "2120",
+      "publication": {
+        "year": "1999",
+        "version": null,
+        "place": "Αθήνα"
+      },
+      "format": "Βιβλίο",
+      "original_language": "γαλλικά",
+      "original_title": "Celui qui savait tout",
+      "price": "5,81",
+      "availability": "Κυκλοφορεί",
+      "last_update": null,
+      "series": {
+      },
+      "physical_description": {
+        "pages": "110",
+        "size": "21x14",
+        "cover_type": "Μαλακό εξώφυλλο"
+      }
+    }
+  ]
+}

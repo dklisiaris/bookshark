@@ -3,16 +3,16 @@ require_relative 'base'
 module Biblionet
   module Crawlers
 
-    class BookCrawler < Base
+    class BibliographicalRecordCrawler < Base
       def initialize(options = {})
-        options[:folder]    ||= 'lib/bookshark/storage/html_book_pages'
-        options[:base_url]  ||= 'http://www.biblionet.gr/book/'
-        options[:page_type] ||= 'book'
-        options[:extension] ||= '.html'
+        options[:folder]            ||= 'lib/bookshark/storage/html_book_pages'
+        options[:base_url]          ||= 'http://www.biblionet.gr/main.asp?page=results&Titlesid='
+        options[:page_type]         ||= 'bg_record'
+        options[:extension]         ||= '.html'
         options[:save_only_content] ||= true
-        options[:start]     ||= 1
-        options[:finish]    ||= 10000
-        options[:step]      ||= 1000    
+        options[:start]             ||= 176001
+        options[:finish]            ||= 180000
+        options[:step]              ||= 1000    
         super(options)
       end
 
@@ -25,7 +25,7 @@ module Biblionet
           # Create a new directory (does nothing if directory exists) 
           path = File.dirname(file_to_save)
           FileUtils.mkdir_p path unless File.directory?(path)
-
+          
           # No need to download the whole page. Just the part containing the book.
           if @save_only_content
             content_re = /<!-- CONTENT START -->.*<!-- CONTENT END -->/m
@@ -34,9 +34,9 @@ module Biblionet
           else
             downloader.save_page(file_to_save) unless downloader.page.nil? or downloader.page.length < 1024
           end
+                    
         end
       end
-
     end
 
   end

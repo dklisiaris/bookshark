@@ -10,6 +10,8 @@ require 'bookshark/extractors/search'
 
 require 'bookshark/crawlers/base'
 require 'bookshark/crawlers/publisher_crawler'
+require 'bookshark/crawlers/book_crawler'
+require 'bookshark/crawlers/bibliographical_record_crawler'
 
 module Bookshark
   DEFAULTS ||= {
@@ -76,7 +78,8 @@ module Bookshark
 
       uri = process_options(options, __method__)
       options[:format]  ||= @format
-      options[:eager]   ||= false            
+      options[:eager]   ||= false   
+      options[:nilify]  ||= false       
       
       if options[:eager]
         book = eager_extract_book(uri)
@@ -86,8 +89,12 @@ module Bookshark
 
       response = {}      
       response[:book] = !book.nil? ? [book] : []
+
+      return nil if response[:book].empty? and options[:nilify]
+      
       response = change_format(response, options[:format])
-      response = book_extractor.decode_text(response)
+      
+      response = book_extractor.decode_text(response) if response.class == "String"
       
       return response            
     end
@@ -137,9 +144,9 @@ module Bookshark
       return response       
     end
 
-    def books_from_storage
-      extract_from_storage_and_save('book', 'html_book_pages', 'json_book_pages')
-    end
+    # def books_from_storage
+    #   extract_from_storage_and_save('book', 'html_book_pages', 'json_book_pages')
+    # end
 
     def authors_from_storage
       extract_from_storage_and_save('author', 'html_author_pages', 'json_author_pages')
@@ -152,6 +159,17 @@ module Bookshark
     def categories_from_storage
       extract_from_storage_and_save('category', 'html_category_pages', 'json_category_pages')
     end
+
+    def extract_books_from_storage_and_save(start_id, finish_id, format = 'pretty_json')
+      start_id.upto(finish_id) do |book_id|
+        record = book(id: book_id, local: true, format: format, nilify: true)
+
+        dir_to_save = Bookshark.path_to_storage + '/' + 'json_book_records/' + "#{((book_id-1)/1000)}/" + "book_#{book_id}.json"
+        
+        save_to(dir_to_save, record) unless record.nil?
+      end
+    end
+
 
     def extract_from_storage_and_save(metadata_type, source_dir, target_dir)      
       list_directories(path: Bookshark.path_to_storage + '/' + source_dir).each do |dir|
@@ -168,8 +186,8 @@ module Bookshark
             record = author(options)
           when 'publisher'
             record = publisher(options)
-          when 'book'
-            record = book(options)
+          # when 'book'
+          #   record = book(options)
           when 'category'
             record = category(options)       
           end  
@@ -331,6 +349,16 @@ module Bookshark
       # end
       # puts Biblionet::Extractors::Base.new("http://www.biblionet.gr/com/245").page
       crawler = Biblionet::Crawlers::PublisherCrawler.new
+      crawler.crawl_and_save
+    end
+
+    def books(options = {})
+      crawler = Biblionet::Crawlers::BookCrawler.new(options)
+      crawler.crawl_and_save
+    end
+
+    def bibliographical_records(options = {})
+      crawler = Biblionet::Crawlers::BibliographicalRecordCrawler.new(options)
       crawler.crawl_and_save
     end
 

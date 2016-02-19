@@ -206,7 +206,15 @@ module Biblionet
         book_hash[:category]   = ddcs
         book_hash[:b_id] = biblionet_id
 
-        uri = "http://www.biblionet.gr/main.asp?page=results&Titlesid=#{biblionet_id}"
+        uri = nil
+
+        if @url
+          uri =  "http://www.biblionet.gr/main.asp?page=results&Titlesid=#{biblionet_id}"
+        elsif @filepath
+          uri = File.dirname(@filepath) + "/" + "bg_record_#{biblionet_id}.html"
+        end
+
+        # uri = "http://www.biblionet.gr/main.asp?page=results&Titlesid=#{biblionet_id}"
 
         bibliographical_book_extractor = Biblionet::Extractors::BibliographicalBookExtractor.new
         bibliographical_details = bibliographical_book_extractor.load_and_extract_book(uri)      

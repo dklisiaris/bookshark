@@ -1,0 +1,61 @@
+{
+  "book": [
+    {
+      "title": "Νατάσα η βασίλισσα των εντόμων",
+      "subtitle": null,
+      "image": null,
+      "author": [
+        {
+          "name": "Χρήστος Τσανάκας",
+          "b_id": "125"
+        }
+      ],
+      "contributors": {
+        "επιμέλεια σειράς": [
+          {
+            "name": "Νίκος Χατζόπουλος",
+            "b_id": "1114"
+          }
+        ]
+      },
+      "publisher": {
+        "text": "Οξύ",
+        "b_id": "332"
+      },
+      "isbn": "960-7614-50-",
+      "isbn_13": "978-960-7614-50-6",
+      "award": [
+
+      ],
+      "description": null,
+      "category": [
+        {
+          "ddc": "889.3",
+          "name": "Νεοελληνική πεζογραφία",
+          "b_id": "42"
+        }
+      ],
+      "b_id": "2129",
+      "publication": {
+        "year": "1998",
+        "version": null,
+        "place": "Αθήνα"
+      },
+      "format": "Βιβλίο",
+      "original_language": null,
+      "original_title": null,
+      "price": "9,17",
+      "availability": "Κυκλοφορεί",
+      "last_update": "27/7/2011",
+      "series": {
+        "name": "Ασύρματος",
+        "volume": null
+      },
+      "physical_description": {
+        "pages": "212",
+        "size": "21x14",
+        "cover_type": "Μαλακό εξώφυλλο"
+      }
+    }
+  ]
+}

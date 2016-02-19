@@ -5,13 +5,14 @@ module Biblionet
 
     class Base
       def initialize(options = {})
-        @folder     = options[:folder]    ||= 'lib/bookshark/storage/html_base_pages'
-        @base_url   = options[:base_url]  ||= 'http://www.biblionet.gr/base/'
-        @page_type  = options[:page_type] ||= 'base'
-        @extension  = options[:extension] ||= '.html'
-        @start      = options[:start]     ||= 1
-        @finish     = options[:finish]    ||= 10000
-        @step       = options[:step]      ||= 1000
+        @folder             = options[:folder]            ||= 'lib/bookshark/storage/html_base_pages'
+        @base_url           = options[:base_url]          ||= 'http://www.biblionet.gr/base/'
+        @page_type          = options[:page_type]         ||= 'base'
+        @extension          = options[:extension]         ||= '.html'
+        @save_only_content  = options[:save_only_content] ||= false
+        @start              = options[:start]             ||= 1
+        @finish             = options[:finish]            ||= 10000
+        @step               = options[:step]              ||= 1000
       end
 
       def spider
@@ -20,7 +21,8 @@ module Biblionet
         
         start.step(finish, @step) do |last|  
           first     = last - @step + 1
-          subfolder = (last/@step - 1).to_s
+          subfolder = (last/@step - 1).to_s          
+          slash     = (@page_type != 'bg_record') ? '/' : ''
           path      = "#{@folder}/#{subfolder}/"
 
           # Create a new directory (does nothing if directory exists)
@@ -28,7 +30,7 @@ module Biblionet
 
           first.upto(last) do |id|
             file_to_save    = "#{path}#{@page_type}_#{id}#{@extension}"
-            url_to_download = "#{@base_url}#{id}/"
+            url_to_download = "#{@base_url}#{id}#{slash}"
 
             yield(url_to_download, file_to_save)
             # downloader = Biblionet::Core::Base.new(url_to_download)

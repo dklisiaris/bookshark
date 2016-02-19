@@ -1,0 +1,67 @@
+{
+  "book": [
+    {
+      "title": "Κριτική του φαλλοκεντρισμού",
+      "subtitle": "Στον Freud και στον Lacan και η θεωρία του σταδίου του καθρέφτη",
+      "image": "http://www.biblionet.gr/images/covers/b2142.jpg",
+      "author": [
+        {
+          "name": "Anthony Wilden",
+          "b_id": "140"
+        }
+      ],
+      "contributors": {
+        "μετάφραση": [
+          {
+            "name": "Φώτης Τερζάκης",
+            "b_id": "1112"
+          }
+        ],
+        "επιμέλεια σειράς": [
+          {
+            "name": "Φώτης Τερζάκης",
+            "b_id": "1112"
+          }
+        ]
+      },
+      "publisher": {
+        "text": "Οξύ",
+        "b_id": "332"
+      },
+      "isbn": "960-7614-57-7",
+      "isbn_13": "978-960-7614-57-5",
+      "award": [
+
+      ],
+      "description": null,
+      "category": [
+        {
+          "ddc": "150.195",
+          "name": "Ψυχανάλυση",
+          "b_id": "144"
+        }
+      ],
+      "b_id": "2142",
+      "publication": {
+        "year": "1998",
+        "version": null,
+        "place": "Αθήνα"
+      },
+      "format": "Βιβλίο",
+      "original_language": "αγγλικά",
+      "original_title": null,
+      "price": "7,13",
+      "availability": "Κυκλοφορεί",
+      "last_update": "27/7/2011",
+      "series": {
+        "name": "Ιστάρ",
+        "volume": null
+      },
+      "physical_description": {
+        "pages": "119",
+        "size": "21x14",
+        "cover_type": "Μαλακό εξώφυλλο"
+      }
+    }
+  ]
+}
