@@ -13,7 +13,7 @@ The representation of bibliographic metadata in JSON is inspired by [BibJSON](ht
 Add this line to your application's Gemfile:
 
 ```ruby
-gem 'bookshark', "~> 1.0.0.pre"
+gem 'bookshark', "~> 1.0"
 ```
 
 And then execute:
@@ -22,7 +22,7 @@ And then execute:
 
 Or install it yourself as:
 
-    $ gem install bookshark --pre
+    $ gem install bookshark
 
 Require and include bookshark in your class/module.
 
@@ -85,7 +85,7 @@ extractor.book(isbn: '9789601411576')
 # Extract book with id 103788 from website
 extractor.book(id: 103788)
 
-# Extract book from the provided webpage 
+# Extract book from the provided webpage
 extractor.book(uri: 'http://biblionet.gr/book/103788/')
 
 # Extract book with id 103788 from local storage
@@ -93,12 +93,12 @@ extractor.book(id: 103788, local: true)
 ```
 For more options, like book's title or author, use the search method which is described below.
 
-**Book Options** 
+**Book Options**
 (Recommended option is to use just the id and let bookshark to generate uri):
 
 * id : The id of book on the corresponding site (Integer)
 * uri : The url of book web page or the path to local file.
-* local : Boolean value. Has page been saved locally? (default is false) 
+* local : Boolean value. Has page been saved locally? (default is false)
 * format : The format in which the extracted data are returned
   * hash (default)
   * json
@@ -112,9 +112,9 @@ puts Bookshark::Extractor.new(format: 'pretty_json').book(id: 185281)
 
 #### Eager Extraction
 
-Each book has some attributes such as authors, contributors, categories etc which are actually references to other objects.   
-By default when extracting a book, you get only names of these objects and references to their pages.   
-With eager option set to true, each of these objects' data is extracted and the produced output contains complete information about every object.   
+Each book has some attributes such as authors, contributors, categories etc which are actually references to other objects.
+By default when extracting a book, you get only names of these objects and references to their pages.
+With eager option set to true, each of these objects' data is extracted and the produced output contains complete information about every object.
 Eager extraction doesn't work with local option enabled.
 
 ```ruby
@@ -215,24 +215,24 @@ extractor.search(title: 'αρχοντας', author: 'τολκιν', results_type
 ```
 Searching and extracting several books can be very slow at times, so instead of extracting every single book you may prefer only the ids of found books. In that case pass the option `results_type: 'ids'`.
 
-**Search Options**:  
+**Search Options**:
 With enought options you can customize your query to your needs. It is recommended to use at least two of the search options.
 
-* title (The title of book to search)       
-* author (The author's last name is enough for filter the search)      
+* title (The title of book to search)
+* author (The author's last name is enough for filter the search)
 * publisher
 * category
 * title_split
   * 0 (The exact title phrase must by matched)
-  * 1 (Default - All the words in title must be matched in whatever order)   
+  * 1 (Default - All the words in title must be matched in whatever order)
   * 2 (At least one word should match)
-* book_id (Providing id means only one book should returned)      
-* isbn         
-* author_id (ID of the selected author)    
-* publisher_id 
-* category_id  
-* after_year (Published this year or later)   
-* before_year (Published this year or before)   
+* book_id (Providing id means only one book should returned)
+* isbn
+* author_id (ID of the selected author)
+* publisher_id
+* category_id
+* after_year (Published this year or later)
+* before_year (Published this year or before)
 * results_type
   * metadata (Default - Every book is extracted and an array of metadata is returned)
   * ids (Only ids are returned)
@@ -243,7 +243,7 @@ With enought options you can customize your query to your needs. It is recommend
 
 Results with ids option look like that:
 
-```json 
+```json
 {
  "book": [
     "119000",
@@ -271,7 +271,7 @@ Normally results are multiple books like the ones in book extractors:
     {
       "title": "Σημεία και τέρατα της οικονομίας",
       "subtitle": "Η κρυφή πλευρά των πάντων",
-      "... Rest of Metadata ...": "... condensed ..."     
+      "... Rest of Metadata ...": "... condensed ..."
     },
     {
       "title": "Και άλλα σημεία και τέρατα από την ιστορία",
@@ -281,7 +281,7 @@ Normally results are multiple books like the ones in book extractors:
     {
       "title": "Σημεία και τέρατα από την ιστορία",
       "subtitle": null,
-      "... Rest of Metadata ...": "... condensed ..."      
+      "... Rest of Metadata ...": "... condensed ..."
     }
   ]
 }
@@ -304,7 +304,7 @@ extractor.author(uri: 'storage/html_author_pages/2/author_2423.html', local: tru
 **Author Options**: (Recommended option is to use just the id and let bookshark to generate uri):
 * id : The id of author on the corresponding site (Integer)
 * uri : The url of author web page or the path to local file.
-* local : Boolean value. Has page been saved locally? (default is false) 
+* local : Boolean value. Has page been saved locally? (default is false)
 
 The expected result of an author extraction is something like this:
 
@@ -329,7 +329,7 @@ The expected result of an author extraction is something like this:
   ]
 }
 ```
-The convention here is that there is never just a single author, but instead the author hash is stored inside an array. 
+The convention here is that there is never just a single author, but instead the author hash is stored inside an array.
 So, it is easy to include metadata for multiple authors or even for multiple types of entities such as publishers or books on the same json file.
 
 ### Extract Publisher Data
@@ -342,7 +342,7 @@ extractor = Extractor.new(format: 'pretty_json')
 # Extract publisher with id 20 from website
 extractor.publisher(id: 20)
 
-# Extract publisher from the provided webpage 
+# Extract publisher from the provided webpage
 extractor.publisher(uri: 'http://biblionet.gr/com/20/')
 
 # Extract publisher with id 20 from local storage
@@ -352,7 +352,7 @@ extractor.publisher(id: 20, local: true)
 
 * id : The id of publisher on the corresponding site (Integer)
 * uri : The url of publisher web page or the path to local file.
-* local : Boolean value. Has page been saved locally? (default is false) 
+* local : Boolean value. Has page been saved locally? (default is false)
 * format : The format in which the extracted data are returned
   * hash (default)
   * json
@@ -397,7 +397,7 @@ The expected result of an author extraction is something like this:
           ],
           "fax": "210 3650069",
           "email": "info@patakis.gr",
-          "website": "www.patakis.gr"      	  
+          "website": "www.patakis.gr"
         }
       },
       "b_id": "20"
@@ -415,7 +415,7 @@ extractor = Extractor.new(format: 'pretty_json')
 # Extract category with id 1041 from website
 extractor.category(id: 1041)
 
-# Extract category from the provided webpage 
+# Extract category from the provided webpage
 extractor.category(uri: 'http://biblionet.gr/index/1041/')
 
 # Extract category with id 1041 from local storage
@@ -425,7 +425,7 @@ extractor.category(id: 1041, local: true)
 
 * id : The id of category on the corresponding site (Integer)
 * uri : The url of category web page or the path to local file.
-* local : Boolean value. Has page been saved locally? (default is false) 
+* local : Boolean value. Has page been saved locally? (default is false)
 * format : The format in which the extracted data are returned
   * hash (default)
   * json
@@ -490,7 +490,7 @@ Take a look at this table:
 |---------|:-----------:|----------------------------------|
 | 103788  | book        | http://biblionet.gr/book/103788  |
 | 10207   | author      | http://biblionet.gr/author/10207 |
-| 20      | publisher   | http://biblionet.gr/com/20       | 
+| 20      | publisher   | http://biblionet.gr/com/20       |
 | 1041    | category    | http://biblionet.gr/index/1041   |
 
 So if you want to use the uri option provide the target webpage's url as seen above without any slugs after th id.
