@@ -7,6 +7,7 @@ require 'bookshark/extractors/book_extractor'
 require 'bookshark/extractors/bibliographical_book_extractor'
 require 'bookshark/extractors/publisher_extractor'
 require 'bookshark/extractors/search'
+require 'bookshark/extractors/nlg/book_extractor'
 
 require 'bookshark/crawlers/base'
 require 'bookshark/crawlers/publisher_crawler'
@@ -22,8 +23,8 @@ module Bookshark
   def self.root
     # File.dirname __dir__ # Works only on ruby > 2.0.0
     File.expand_path(File.join(File.dirname(__FILE__), '../'))
-  end  
- 
+  end
+
   def self.path_to_storage
     File.join root, 'lib/bookshark/storage'
   end
@@ -31,7 +32,7 @@ module Bookshark
 
   class Extractor
     include FileManager
-    attr_accessor :site, :format    
+    attr_accessor :site, :format
 
     def initialize(options = {})
       options = DEFAULTS.merge(options)
@@ -44,9 +45,9 @@ module Bookshark
       options[:format] ||= @format
 
       author_extractor = Biblionet::Extractors::AuthorExtractor.new
-      author = author_extractor.load_and_extract_author(uri) 
-          
-      response = {}      
+      author = author_extractor.load_and_extract_author(uri)
+
+      response = {}
       response[:author] = !author.nil? ? [author] : []
       response = change_format(response, options[:format])
       return response
@@ -58,90 +59,107 @@ module Bookshark
 
       publisher_extractor = Biblionet::Extractors::PublisherExtractor.new
       publisher = publisher_extractor.load_and_extract_publisher(uri)
-      
-      response = {}      
+
+      response = {}
       response[:publisher] = !publisher.nil? ? [publisher] : []
       response = change_format(response, options[:format])
       response = publisher_extractor.decode_text(response)
 
       return response
-      # return uri     
-    end    
-
-    def book(options = {})
-      book_extractor = Biblionet::Extractors::BookExtractor.new
-      
-      if book_extractor.present?(options[:isbn])
-        search_engine = Biblionet::Extractors::Search.new
-        options[:id]  = search_engine.search_by_isbn(options[:isbn])
-      end  
-
-      uri = process_options(options, __method__)
-      options[:format]  ||= @format
-      options[:eager]   ||= false   
-      options[:nilify]  ||= false       
-      
-      if options[:eager]
-        book = eager_extract_book(uri)
-      else        
-        book = book_extractor.load_and_extract_book(uri)
-      end
-
-      response = {}      
-      response[:book] = !book.nil? ? [book] : []
-
-      return nil if response[:book].empty? and options[:nilify]
-      
-      response = change_format(response, options[:format])
-      
-      response = book_extractor.decode_text(response) if response.class == "String"
-      
-      return response            
+      # return uri
     end
 
-    
+    def book(options = {})
+      if options[:site] == 'biblionet'
+        book_extractor = Biblionet::Extractors::BookExtractor.new
+
+        if book_extractor.present?(options[:isbn])
+          search_engine = Biblionet::Extractors::Search.new
+          options[:id]  = search_engine.search_by_isbn(options[:isbn])
+        end
+
+        uri = process_options(options, __method__)
+        options[:format]  ||= @format
+        options[:eager]   ||= false
+        options[:nilify]  ||= false
+
+        if options[:eager]
+          book = eager_extract_book(uri)
+        else
+          book = book_extractor.load_and_extract_book(uri)
+        end
+
+        response = {}
+        response[:book] = !book.nil? ? [book] : []
+
+        return nil if response[:book].empty? and options[:nilify]
+
+        response = change_format(response, options[:format])
+
+        response = book_extractor.decode_text(response) if response.class == "String"
+
+        return response
+      elsif options[:site] == 'nlg'
+        book_extractor = Nlg::Extractors::BookExtractor.new
+
+        options[:format] ||= @format
+
+        # if !options[:uri].nil?
+        #   uri = "#{options[:uri]}/Export?style=MARCXML"
+        # elsif !options[:id].nil?
+        #   uri = "http://nbib.nlg.gr/Record/#{options[:id]}/Export?style=MARCXML"
+        # end
+
+        book = book_extractor.load_and_extract_book(options[:id])
+
+        response = {}
+        response[:book] = !book.nil? ? [book] : []
+      end
+    end
+
+
     # def bibliographical_book(options = {})
     #   bibliographical_book_extractor = Biblionet::Extractors::BibliographicalBookExtractor.new
- 
+
     #   uri = "http://www.biblionet.gr/main.asp?page=results&Titlesid=#{options[:id]}"
     #   options[:format]  ||= @format
- 
+
     #   book = bibliographical_book_extractor.load_and_extract_book(uri)
- 
-    #   response = {}      
+
+    #   response = {}
     #   response[:book] = !book.nil? ? [book] : []
     #   response = change_format(response, options[:format])
-    #   response = bibliographical_book_extractor.decode_text(response)      
-    # end    
-    
+    #   response = bibliographical_book_extractor.decode_text(response)
+    # end
+
     # puts Bookshark::Extractor.new(format: 'pretty_json').bibliographical_book(id: 103788)
 
     def category(options = {})
       uri = process_options(options, __method__)
-      options[:format] ||= @format      
+      options[:format] ||= @format
 
       category_extractor = Biblionet::Extractors::CategoryExtractor.new
       category = category_extractor.extract_categories_from(uri)
 
-      response = {}      
+      response = {}
       response[:category] = !category.nil? ? [category] : []
       response = change_format(response, options[:format])
-      
-      return response        
+
+      return response
     end
 
     def search(options = {})
       options[:format]        ||= @format
-      options[:results_type]  ||= 'metadata'           
+      options[:results_type]  ||= 'metadata'
 
       search_engine  = Biblionet::Extractors::Search.new
       search_results = search_engine.perform_search(options)
 
-      response = {}      
+      response = {}
       response[:book] = search_results
       response = change_format(response, options[:format])
-      
-      return response       
+
+      return response
     end
 
     # def books_from_storage
@@ -165,22 +183,22 @@ module Bookshark
         record = book(id: book_id, local: true, format: format, nilify: true)
 
         dir_to_save = Bookshark.path_to_storage + '/' + 'json_book_records/' + "#{((book_id-1)/1000)}/" + "book_#{book_id}.json"
-        
+
         save_to(dir_to_save, record) unless record.nil?
       end
     end
 
 
-    def extract_from_storage_and_save(metadata_type, source_dir, target_dir)      
+    def extract_from_storage_and_save(metadata_type, source_dir, target_dir)
       list_directories(path: Bookshark.path_to_storage + '/' + source_dir).each do |dir|
-        dir_to_save = dir.gsub(source_dir, target_dir)        
+        dir_to_save = dir.gsub(source_dir, target_dir)
 
         list_files(path: dir, extension: 'html', all:true).each do |file|
-          puts "Extracting from file: " + file.to_s          
+          puts "Extracting from file: " + file.to_s
 
           # Extract publisher metadata form local file.
-          options = {uri: file, format: 'pretty_json', local: true}          
-          
+          options = {uri: file, format: 'pretty_json', local: true}
+
           case metadata_type
           when 'author'
             record = author(options)
@@ -189,16 +207,16 @@ module Bookshark
           # when 'book'
           #   record = book(options)
           when 'category'
-            record = category(options)       
-          end  
+            record = category(options)
+          end
 
           # Prepare a path to save the new file.
           filename  = File.basename(file,".*")
           path_to_save = "#{dir_to_save}#{filename}.json"
-      
-          # Save to file.        
+
+          # Save to file.
           save_to("#{path_to_save}", record)
-          
+
         end # unless File.directory?(dir_to_save) # if dir.end_with? '/195/'
       end
     end
@@ -209,9 +227,9 @@ module Bookshark
       # end
       category_extractor = Biblionet::Extractors::CategoryExtractor.new
       all_categories = Hash.new
-      
+
       list_files(path: 'storage/raw_ddc_pages', extension: 'html', all:true).each do |file|
-        categories = category_extractor.extract_categories_from(file)                 
+        categories = category_extractor.extract_categories_from(file)
         all_categories.merge!(categories) unless categories.nil? or categories.empty?
       end
 
@@ -228,19 +246,19 @@ module Bookshark
 
       list_directories(path: 'storage/raw_html_pages').each do |dir|
         dir_to_save = dir.gsub(/raw_html_pages/, 'books')
-        
-        list_files(path: dir, extension: 'html', all:true).each do |file|        
-      
+
+        list_files(path: dir, extension: 'html', all:true).each do |file|
+
           # Load the book from html file and parse the data.
           # pp "Parsing book: #{file}"
           pp file
           book = bp.load_and_extract_book(file)
-      
+
           # Prepare a path to save the new file.
           filename  = File.basename(file,".*")
           path_to_save = "#{dir_to_save}#{filename}.json"
-      
-          # Save to file.        
+
+          # Save to file.
           bp.save_to("#{path_to_save}", JSON.pretty_generate(book))
           # pp "Book #{file} saved!"
         end unless File.directory?(dir_to_save) # if dir.end_with? '/195/'
@@ -266,11 +284,11 @@ module Bookshark
           url_method    = 'book'
           local_path    = "html_book_pages/#{((id-1)/1000)}/book_#{id}.html"
         when 'category'
-          url_method    = 'index' 
-          local_path    = "html_ddc_pages/#{((id-1)/1000)}/ddc_#{id}.html"               
+          url_method    = 'index'
+          local_path    = "html_ddc_pages/#{((id-1)/1000)}/ddc_#{id}.html"
         else
           puts "Called from unknown method. Probably its rspec."
-        end      
+        end
 
         options[:local] ||= false
         url = "#{Bookshark::path_to_storage}/#{local_path}" if options[:local]
@@ -279,7 +297,7 @@ module Bookshark
       uri = options[:uri] ||= url
 
       return uri
-    end  
+    end
 
     def change_format(hash, format)
       case format
@@ -288,10 +306,10 @@ module Bookshark
       when 'json'
         hash = hash.to_json
       when 'pretty_json'
-        hash = JSON.pretty_generate(hash) 
+        hash = JSON.pretty_generate(hash)
       end
       return hash
-    end    
+    end
 
     def eager_extract_book(uri)
       book_extractor      = Biblionet::Extractors::BookExtractor.new
@@ -301,13 +319,13 @@ module Bookshark
 
       book = book_extractor.load_and_extract_book(uri)
 
-      tmp_data = []                 
+      tmp_data = []
       book[:author].each do |author|
-        tmp_data << author_extractor.load_and_extract_author("http://www.biblionet.gr/author/#{author[:b_id]}") 
+        tmp_data << author_extractor.load_and_extract_author("http://www.biblionet.gr/author/#{author[:b_id]}")
       end
-      book[:author] = tmp_data      
-      
-      tmp_data, tmp_hash = [], {}      
+      book[:author] = tmp_data
+
+      tmp_data, tmp_hash = [], {}
       book[:contributors].each do |job, contributors|
         contributors.each do |contributor|
           tmp_data << author_extractor.load_and_extract_author("http://www.biblionet.gr/author/#{contributor[:b_id]}")
@@ -317,19 +335,19 @@ module Bookshark
       end
       book[:contributors] = tmp_hash
 
-      tmp_data, tmp_hash = [], {} 
+      tmp_data, tmp_hash = [], {}
       book[:category].each do |category|
         tmp_data << category_extractor.extract_categories_from("http://www.biblionet.gr/index/#{category[:b_id]}")
       end
-      book[:category] = tmp_data 
-      
-      tmp_data = [] 
-      tmp_data << publisher_extractor.load_and_extract_publisher("http://www.biblionet.gr/com/#{book[:publisher][:b_id]}")  
+      book[:category] = tmp_data
+
+      tmp_data = []
+      tmp_data << publisher_extractor.load_and_extract_publisher("http://www.biblionet.gr/com/#{book[:publisher][:b_id]}")
       book[:publisher] = tmp_data
 
       book
-    end       
-  
+    end
+
   end
 
 
@@ -339,7 +357,7 @@ module Bookshark
 
     def initialize(options = {})
       options = DEFAULTS.merge(options)
-      @site   = options[:site]    
+      @site   = options[:site]
     end
 
     def publishers
@@ -362,11 +380,11 @@ module Bookshark
       crawler.crawl_and_save
     end
 
-  end  
+  end
 
 #   module Biblionet
 #     class Extract
-#       class << self      
+#       class << self
 #         def author(uri=nil)
 #           author_extractor = BiblionetParser::Core::AuthorExtractor.new
 #           author_extractor.load_and_extract_author(uri)
@@ -384,7 +402,7 @@ module Bookshark
 
 #       end
 #     end
-#   end  
+#   end
 end
 
 
