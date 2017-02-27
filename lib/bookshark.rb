@@ -70,6 +70,8 @@ module Bookshark
     end
 
     def book(options = {})
+      options[:site] ||= @site
+
       if options[:site] == 'biblionet'
         book_extractor = Biblionet::Extractors::BookExtractor.new
 

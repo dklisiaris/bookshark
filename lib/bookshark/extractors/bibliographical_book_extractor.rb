@@ -170,10 +170,17 @@ module Biblionet
               text: publisher_node.text,
               b_id: (publisher_node[:href].split("/"))[2]
             }
-            after_last_author_text = @nodeset
+            last_author = @nodeset
               .xpath("//a[@class='booklink' and @href[contains(.,'/author/') ]][last()]").last
-              .next_sibling.text.strip
-            puts after_last_author_text
+
+            if !last_author.nil? && !last_author.empty?
+              after_last_author_text = last_author.next_sibling.text.strip
+            else
+              last_book = @nodeset
+                .xpath("//a[@class='booklink' and @href[contains(.,'/book/') ]][last()]").last
+              after_last_author_text = last_book.next_sibling.text.strip
+            end
+
             details_hash[:publication] = {
               year: after_last_author_text[/(?<=: )\d+(?=\.)/],
               version: after_last_author_text[/(?<=- )\d+(?=η)/],
