@@ -173,7 +173,7 @@ module Biblionet
             last_author = @nodeset
               .xpath("//a[@class='booklink' and @href[contains(.,'/author/') ]][last()]").last
 
-            if !last_author.nil? && !last_author.empty?
+            if !last_author.nil?
               after_last_author_text = last_author.next_sibling.text.strip
             else
               last_book = @nodeset
