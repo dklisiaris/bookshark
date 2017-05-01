@@ -116,6 +116,20 @@ module Biblionet
 
         end
 
+        # Splits availability with date like "Υπό Έκδοση 4/2017" to availablity and last update
+        unless details_hash[:availability].nil?
+          availability = details_hash[:availability]
+          details_hash[:availability] = "Υπό Έκδοση" if availability.include? "Υπό Έκδοση"
+
+          if details_hash[:last_update].nil?
+            if availability =~ /(\d{1,2}\/)?\d{1,2}\/\d{2,}/
+              last_update = availability.match(/(\d{1,2}\/)?\d{1,2}\/\d{2,}/)[0]
+              last_update = "10/" + last_update if last_update.split('/').length == 2
+              details_hash[:last_update] = last_update
+            end
+          end
+        end
+
         pre_details_text = @nodeset.xpath("//span[@class='small'][1]/preceding::text()").text
         pre_details_text = BibliographicalBookExtractor.decode_text(pre_details_text)
 
