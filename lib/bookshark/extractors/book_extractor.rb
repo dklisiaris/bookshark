@@ -6,22 +6,22 @@ require_relative 'bibliographical_book_extractor'
 require 'sanitize'
 
 module Biblionet
-  module Extractors   
-    
-    class BookExtractor < Base      
+  module Extractors
+
+    class BookExtractor < Base
       attr_reader :book
 
       def initialize(uri=nil)
-        super(uri)        
-        extract_book unless uri.nil? or @page.nil?        
+        super(uri)
+        extract_book unless uri.nil? or @page.nil?
       end
 
       def load_and_extract_book(uri=nil)
         load_page(uri)
         extract_book unless uri.nil? or @page.nil?
-      end      
+      end
 
-      # Converts the parsed contributors string to hash. 
+      # Converts the parsed contributors string to hash.
       # String must have been processed into the following form:
       # job1: contributor1, contributor2 job2: contributor3
       # The returned hash is in form: {job1 => ["contributor1","contributor2"],job2 => ["contributor3"]}
@@ -36,18 +36,18 @@ module Biblionet
           else
             partners << cb
             contributors[job] =  partners.clone
-          end  
+          end
         end unless raw_contributors.nil? or raw_contributors.empty?
-        
+
         return contributors
       end
 
       def proccess_details(details)
         details_hash = Hash.new
-        
-        details.each do |detail|          
+
+        details.each do |detail|
           date_regex = /(^\d{4}$)/
-          status_regex = /^\[\p{Word}+(?:\s*[\'\-\+\s]\s*\p{Word}+)*\]$/  
+          status_regex = /^\[\p{Word}+(?:\s*[\'\-\+\s]\s*\p{Word}+)*\]$/
           detail = decode_text(detail)
 
           begin
@@ -59,11 +59,11 @@ module Biblionet
               #puts "Pages: #{pages}"
               details_hash[:pages] = pages
             elsif detail.start_with? "ISBN-13"
-              isbn_13 = detail.gsub(/ISBN-13 /, "")
+              isbn_13 = detail.gsub(/ISBN-13 /, "").gsub("&Chi","X")
               details_hash[:isbn_13] = isbn_13
-              #puts "ISBN: #{isbn_13}"      
+              #puts "ISBN: #{isbn_13}"
             elsif detail.start_with? "ISBN"
-              isbn = detail.gsub(/ISBN /, "")
+              isbn = detail.gsub(/ISBN /, "").gsub("&Chi","X")
               #puts "ISBN: #{isbn}"
               details_hash[:isbn] = isbn
             elsif detail =~ status_regex
@@ -81,12 +81,12 @@ module Biblionet
             elsif detail.start_with? "ISMN" #Special typo case
               isbn = detail.gsub(/ISMN /, "")
               #puts "ISBN: #{isbn}"
-              details_hash[:isbn] = isbn              
-            else 
+              details_hash[:isbn] = isbn
+            else
               raise NoIdeaWhatThisIsError.new(@biblionet_id, detail)
             end
           rescue NoIdeaWhatThisIsError => e
-            pp e        
+            pp e
           end
         end
 
@@ -94,86 +94,86 @@ module Biblionet
       end
 
       def proccess_ddc(ddc, extract_parents = false)
-        # Matches only the digits inside [] in text like: [889.09300] Νεοελληνική λογοτεχνία - Ιστορία και κριτική (300)  
+        # Matches only the digits inside [] in text like: [889.09300] Νεοελληνική λογοτεχνία - Ιστορία και κριτική (300)
         id_re = /(\[DDC\:\s\d*(?:[\.|\s]\d*)*\])/
 
-        # Matches [digits] and (digits) in text like: [889.09300] Νεοελληνική λογοτεχνία - Ιστορία και κριτική (300)   
+        # Matches [digits] and (digits) in text like: [889.09300] Νεοελληνική λογοτεχνία - Ιστορία και κριτική (300)
         non_text_re = /\s*(\[.*\]|\(.*\))\s*/
-                
-        # Gets the dcc part from text and removes anything but digits in [DDC: digits].                
-        ddc_id = ddc.scan(id_re).join.gsub(/[\[\]DDC: ]/, '') # Gets the dcc part from text. 
+
+        # Gets the dcc part from text and removes anything but digits in [DDC: digits].
+        ddc_id = ddc.scan(id_re).join.gsub(/[\[\]DDC: ]/, '') # Gets the dcc part from text.
 
         # Extracts the parent tree of current ddc.
-        # ddcparser.parse(ddc_id)       
+        # ddcparser.parse(ddc_id)
 
         # Gets text by reomoving anything but text.
         ddc_text = ddc.gsub(non_text_re, '').strip
 
-        ddc_hash = { ddc: ddc_id, name: ddc_text } 
+        ddc_hash = { ddc: ddc_id, name: ddc_text }
         return ddc_hash
-      end  
+      end
 
 
-      def extract_book(biblionet_id=@biblionet_id, book_page=@page)                
+      def extract_book(biblionet_id=@biblionet_id, book_page=@page)
         # log = Logger.new(File.new(File.dirname(__dir__).to_s + "/logs/book_parsing.log",'a+'))
         log = Logger.new(STDOUT)
-               
+
         page = BookDataExtractor.new(book_page)
 
         # End extraction if BookDataExtractor couldnt create a nodeset
         return nil if page.nodeset.nil?
 
 
-        book_hash = Hash.new      
+        book_hash = Hash.new
 
-        begin                
-          img = page.image                            
+        begin
+          img = page.image
           raise NoImageError.new(biblionet_id) if img.nil?
         rescue NoImageError => e
-          pp e 
-          log.warn(e.message)                
+          pp e
+          log.warn(e.message)
         rescue StandardError => e
-          pp err_msg = "Error #{e} at book: #{biblionet_id}" 
-          log.error(err_msg)                            
+          pp err_msg = "Error #{e} at book: #{biblionet_id}"
+          log.error(err_msg)
         end
 
-        book_hash[:title] = page.title 
-        book_hash[:subtitle] = page.subtitle        
-        book_hash[:image] = img                          
-      
+        book_hash[:title] = page.title
+        book_hash[:subtitle] = page.subtitle
+        book_hash[:image] = img
+
         contributors = proccess_contributors(page.contributors)
 
         author = contributors[:author]
         contributors.delete(:author)
-        
+
         # If author is empty, maybe its a collective work.
         if author.nil? or author.empty?
-          if page.collective_work?     
+          if page.collective_work?
             # author = 'Συλλογικό έργο'
             author = ['Συλλογικό έργο']
-          else            
-            pp err_msg = "No author has been found at book: #{biblionet_id}" 
-            log.warn(err_msg)   
-            author = []          
+          else
+            pp err_msg = "No author has been found at book: #{biblionet_id}"
+            log.warn(err_msg)
+            author = []
           end
         end
 
         book_hash[:author]       = author
-        book_hash[:contributors] = contributors        
+        book_hash[:contributors] = contributors
         book_hash[:publisher]    = page.publisher
 
         details = page.details
         if details.nil?
           pp err_msg = "No details at book: #{biblionet_id}"
-          log.error(err_msg)       
-        end        
+          log.error(err_msg)
+        end
 
         details_hash = proccess_details(details)
 
         # book_hash[:publication_year] = details_hash[:publication_year]
         # book_hash[:pages]            = details_hash[:pages]
         book_hash[:isbn] = details_hash[:isbn]
-        
+
         if details_hash[:isbn_13].nil?
           if present?(details_hash[:isbn]) and (details_hash[:isbn].strip.gsub('-','').length == 13)
             book_hash[:isbn_13] = book_hash[:isbn]
@@ -192,10 +192,10 @@ module Biblionet
 
         book_hash[:description] = page.description
 
-        ddcs = page.ddcs.map do |ddc|      
+        ddcs = page.ddcs.map do |ddc|
                 # Extract from href the ddc id used by biblionet. --- DdC url http://biblionet.gr/index/id ---
                 ddc_biblionet_id = ddc[:href].split(/\//).last
-                # Extact DdC id and DdC text.     
+                # Extact DdC id and DdC text.
                 ddc = proccess_ddc(ddc.text)
 
                 ddc.merge!(b_id: ddc_biblionet_id)
@@ -217,21 +217,21 @@ module Biblionet
         # uri = "http://www.biblionet.gr/main.asp?page=results&Titlesid=#{biblionet_id}"
 
         bibliographical_book_extractor = Biblionet::Extractors::BibliographicalBookExtractor.new
-        bibliographical_details = bibliographical_book_extractor.load_and_extract_book(uri)      
+        bibliographical_details = bibliographical_book_extractor.load_and_extract_book(uri)
 
         book_hash[:publisher]         = bibliographical_details[:publisher]
-        book_hash[:publication]       = bibliographical_details[:publication]   
+        book_hash[:publication]       = bibliographical_details[:publication]
 
-        book_hash[:format]            = bibliographical_details[:format]     
+        book_hash[:format]            = bibliographical_details[:format]
 
         book_hash[:original_language] = bibliographical_details[:original_language]
         book_hash[:original_title]    = bibliographical_details[:original_title]
 
-        book_hash[:price]             = bibliographical_details[:price]      
+        book_hash[:price]             = bibliographical_details[:price]
         book_hash[:availability]      = bibliographical_details[:availability]
         book_hash[:last_update]       = bibliographical_details[:last_update]
-        
-        book_hash[:series]            = bibliographical_details[:series]        
+
+        book_hash[:series]            = bibliographical_details[:series]
 
         physical_description_hash = {}
         physical_description_hash[:pages]      = details_hash[:pages]
@@ -239,10 +239,10 @@ module Biblionet
         physical_description_hash[:cover_type] = bibliographical_details[:cover_type]
 
         book_hash[:physical_description] = physical_description_hash
-        
 
-        return @book = book_hash  
-      end      
+
+        return @book = book_hash
+      end
     end
 
     class BookDataExtractor
@@ -255,25 +255,25 @@ module Biblionet
           puts document
         end
         content = content_re.match(document)[0] unless (content_re.match(document)).nil?
-        
+
         # If content is nil, there is something wrong with the html, so return nil
         if content.nil?
           @nodeset = nil
         else
-          @nodeset = Nokogiri::HTML(content) 
-        end        
+          @nodeset = Nokogiri::HTML(content)
+        end
       end
 
       def image
         img_node = nil
         img_nodes = @nodeset.xpath("/html/body//img").each do |i|
-          img_candidate = i.xpath("//img[@src[contains(.,'/covers/')]][1]") 
-          img_node = img_candidate unless img_candidate.nil? or img_candidate.empty?                        
-        end                    
+          img_candidate = i.xpath("//img[@src[contains(.,'/covers/')]][1]")
+          img_node = img_candidate unless img_candidate.nil? or img_candidate.empty?
+        end
 
-        img = img_node.nil? ? nil : BASE_URL+(img_node.first)[:src]                             
+        img = img_node.nil? ? nil : BASE_URL+(img_node.first)[:src]
 
-        return img 
+        return img
       end
 
       def title
@@ -292,7 +292,7 @@ module Biblionet
 
       def publisher
         publisher_hash = {}
-        @nodeset.xpath("//a[@class='booklink' and @href[contains(.,'/com/') ]]").each do |item| 
+        @nodeset.xpath("//a[@class='booklink' and @href[contains(.,'/com/') ]]").each do |item|
           publisher_hash[:name] = item.text
           publisher_hash[:b_id] = (item[:href].split("/"))[2]
         end
@@ -301,12 +301,12 @@ module Biblionet
 
       def contributors
         contributors = []
-        @nodeset.xpath("//a[@class='booklink' and @href[contains(.,'/author/') ]]").each do |item| 
-          pre_text = item.previous.text.strip           
+        @nodeset.xpath("//a[@class='booklink' and @href[contains(.,'/author/') ]]").each do |item|
+          pre_text = item.previous.text.strip
           contributors << pre_text unless pre_text == ',' or !pre_text.end_with? ':'
           contributor = {}
-          contributor[:name] = item.text 
-          contributor[:b_id] = (item[:href].split("/"))[2]      
+          contributor[:name] = item.text
+          contributor[:b_id] = (item[:href].split("/"))[2]
           contributors << contributor
         end
         # Alternative way based on intersecting sets
@@ -315,19 +315,19 @@ module Biblionet
 
         # others = book.xpath("#{set_A}[count(.|#{set_B}) = count(#{set_B})]").map do |other|
         #           text = other.inner_text.strip
-        #           other = text == "," ? nil : text          
-        #         end.compact         
+        #           other = text == "," ? nil : text
+        #         end.compact
         contributors
-      end  
+      end
 
       def details
         details = @nodeset.css('.book_details')[0].inner_html.gsub(/(^\d,\d)|(\D,|,\D)(?=[^\]]*(?:\[|$))/, "<br>").split("<br>").map(&:strip).reject!(&:empty?)
         if details.nil?
-          details = @nodeset.css('.book_details')[1].inner_html.gsub(/(^\d,\d)|(\D,|,\D)(?=[^\]]*(?:\[|$))/, "<br>").split("<br>").map(&:strip).reject!(&:empty?)           
+          details = @nodeset.css('.book_details')[1].inner_html.gsub(/(^\d,\d)|(\D,|,\D)(?=[^\]]*(?:\[|$))/, "<br>").split("<br>").map(&:strip).reject!(&:empty?)
         end
 
-        return details     
-      end   
+        return details
+      end
 
       def description
         desc = @nodeset.css('p').last.inner_html #.to_s.gsub(/<br>/,'\\n')
@@ -338,51 +338,51 @@ module Biblionet
         else
           return desc
         end
-      end   
+      end
 
       def ddcs
         @nodeset.xpath("//a[@class='subjectlink' and @href[contains(.,'/index/') ]]")
-      end   
+      end
 
       def collective_work?
         return @nodeset.at_css('h1.book_title').parent.text.include?('Συλλογικό έργο') ? true : false
-      end 
+      end
 
       # Special case in which there is no author but there are contributors
       def has_contributors_but_no_authors?
         node_start = "//h1[@class='book_title']/following::text()"
         node_end = "//a[@class='booklink' and @href[contains(.,'/author/') ]][1]/preceding::text()"
         between = (@nodeset.xpath(node_start) & @nodeset.xpath(node_end)).text.strip
-                
-        if !between.empty? and between.end_with? ':'        
+
+        if !between.empty? and between.end_with? ':'
           true
         else
           false
         end
-      end  
+      end
 
       def awards
-        awards = []        
+        awards = []
         @nodeset.xpath("//a[@class='booklink' and @href[contains(.,'page=showaward') ]]").each do |item|
-          award = {name: item.text, year: item.next_sibling.text.strip.gsub(/[^\d]/, '')}          
+          award = {name: item.text, year: item.next_sibling.text.strip.gsub(/[^\d]/, '')}
           awards << award
         end
-        
+
         return awards
-      end    
+      end
 
     end
 
     # Raised when a book has no image.
     #
-    class NoImageError < StandardError      
+    class NoImageError < StandardError
       attr_reader :biblionet_id
 
-      def initialize(biblionet_id)        
+      def initialize(biblionet_id)
         msg = "This book has no image. At book #{biblionet_id}"
         super(msg)
-      end    
-    end     
+      end
+    end
 
   end
 end
@@ -454,10 +454,10 @@ end
 #   book_hash['description'] = desc
 # end
 
-# ddcs = page.xpath("//a[@class='subjectlink' and @href[contains(.,'/index/') ]]").map do |ddc|      
+# ddcs = page.xpath("//a[@class='subjectlink' and @href[contains(.,'/index/') ]]").map do |ddc|
 #         # Extract from href the ddc id used by biblionet. --- DdC url http://biblionet.gr/index/id ---
 #         ddc_biblionet_id = ddc[:href].split(/\//).last
-#         # Extact DdC id and DdC text.     
+#         # Extact DdC id and DdC text.
 #         ddc = proccess_ddc(ddc.text)
 
 #         ddc.merge!(b_id: ddc_biblionet_id)
@@ -477,17 +477,17 @@ end
 # end
 
 # def contributors(n)
-#   contributors = []  
-#   n.xpath("//a[@class='booklink' and @href[contains(.,'/author/') ]]").each do |item| 
-#     pre_text = item.previous.text.strip           
+#   contributors = []
+#   n.xpath("//a[@class='booklink' and @href[contains(.,'/author/') ]]").each do |item|
+#     pre_text = item.previous.text.strip
 #     contributors << pre_text unless pre_text == ',' or !pre_text.end_with? ':'
 #     contributor = {}
-#     contributor['name'] = item.text 
-#     contributor['b_id'] = (item[:href].split("/"))[2]      
+#     contributor['name'] = item.text
+#     contributor['b_id'] = (item[:href].split("/"))[2]
 #     contributors << contributor
-#   end       
+#   end
 #   contributors
-# end  
+# end
 
 # c = contributors(n4)
 
@@ -502,9 +502,9 @@ end
 #     else
 #       partners << cb
 #       contributors[job] =  partners.clone
-#     end  
+#     end
 #   end unless raw_contributors.nil? or raw_contributors.empty?
-  
+
 #   return contributors
 # end
 
