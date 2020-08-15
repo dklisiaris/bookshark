@@ -1,4 +1,4 @@
-require "bookshark/version"
+require 'bookshark/version'
 require 'bookshark/storage/file_manager'
 
 require 'bookshark/extractors/author_extractor'

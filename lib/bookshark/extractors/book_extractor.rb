@@ -46,41 +46,41 @@ module Biblionet
         details_hash = Hash.new
 
         details.each do |detail|
-          date_regex = /(^\d{4}$)/
+          date_regex = /(^(\d{4})|(, \d{4})$)/
           status_regex = /^\[\p{Word}+(?:\s*[\'\-\+\s]\s*\p{Word}+)*\]$/
           detail = decode_text(detail)
 
           begin
             if detail =~ date_regex
-              #puts "Publication Year: #{detail}"
+              # puts "Publication Year: #{detail}"
               details_hash[:publication_year] = detail
-            elsif detail.end_with? "σελ."
+            elsif detail.end_with? 'σελ.'
               pages = detail.gsub(/[^\d]/, '')
-              #puts "Pages: #{pages}"
+              # puts "Pages: #{pages}"
               details_hash[:pages] = pages
-            elsif detail.start_with? "ISBN-13"
-              isbn_13 = detail.gsub(/ISBN-13 /, "").gsub("&Chi","X")
-              details_hash[:isbn_13] = isbn_13
-              #puts "ISBN: #{isbn_13}"
-            elsif detail.start_with? "ISBN"
-              isbn = detail.gsub(/ISBN /, "").gsub("&Chi","X")
-              #puts "ISBN: #{isbn}"
+            elsif detail.start_with? 'ISBN-13'
+              isbn13 = detail.gsub(/ISBN-13 /, '').gsub('&Chi', 'X').gsub("\u0081]", '-')
+              details_hash[:isbn_13] = isbn13
+              # puts "ISBN: #{isbn_13}"
+            elsif detail.start_with? 'ISBN'
+              isbn = detail.gsub(/ISBN /, '').gsub('&Chi', 'X').gsub("\u0081]", '-')
+              # puts "ISBN: #{isbn}"
               details_hash[:isbn] = isbn
             elsif detail =~ status_regex
               status = detail.gsub(/\[|\]/, '')
-              #puts "Status: #{status}"
+              # puts "Status: #{status}"
               details_hash[:status] = status
-            elsif detail.start_with? "Τιμή"
+            elsif detail.start_with? 'Τιμή'
               price = detail.gsub(/[^\d,\d]/, '')
-              #puts "Price: #{price}"
+              # puts "Price: #{price}"
               details_hash[:price] = price
             elsif detail.start_with? '<img src="/images/award.jpg" border="0" title="Βραβείο">'
               award = Sanitize.clean(detail).strip
               details_hash[:awards] = [] if details_hash[:awards].nil?
               details_hash[:awards] << award
-            elsif detail.start_with? "ISMN" #Special typo case
-              isbn = detail.gsub(/ISMN /, "")
-              #puts "ISBN: #{isbn}"
+            elsif detail.start_with? 'ISMN' # Special typo case
+              isbn = detail.gsub(/ISMN /, '')
+              # puts "ISBN: #{isbn}"
               details_hash[:isbn] = isbn
             else
               raise NoIdeaWhatThisIsError.new(@biblionet_id, detail)
@@ -321,12 +321,21 @@ module Biblionet
       end
 
       def details
-        details = @nodeset.css('.book_details')[0].inner_html.gsub(/(^\d,\d)|(\D,|,\D)(?=[^\]]*(?:\[|$))/, "<br>").split("<br>").map(&:strip).reject!(&:empty?)
+        details = @nodeset.css('.book_details')[0]
+                          .inner_html
+                          .gsub(/(^\d,\d)|(\D,|,\D)(?=[^\]]*(?:\[|$))/, '<br>')
+                          .split('<br>').map(&:strip)
+                          .reject(&:empty?)
         if details.nil?
-          details = @nodeset.css('.book_details')[1].inner_html.gsub(/(^\d,\d)|(\D,|,\D)(?=[^\]]*(?:\[|$))/, "<br>").split("<br>").map(&:strip).reject!(&:empty?)
+          details = @nodeset.css('.book_details')[1]
+                            .inner_html
+                            .gsub(/(^\d,\d)|(\D,|,\D)(?=[^\]]*(?:\[|$))/, '<br>')
+                            .split('<br>')
+                            .map(&:strip)
+                            .reject(&:empty?)
         end
 
-        return details
+        details
       end
 
       def description
