@@ -1,3 +1,8 @@
+DEPRECATED
+----------
+
+> This gem does not work anymore. It was used to extract data from the previous biblionet.gr website and provide an easy to use json response. For years it did a good enough job but nowadays biblionet provides it's own json api webservice so you can use this directly [biblionet-webservice](https://biblionet.diadrasis.net/webservice/).
+
 # Bookshark
 ![Bookshark Logo](https://dl.dropboxusercontent.com/u/4888041/bookshark/logo.png)
 
